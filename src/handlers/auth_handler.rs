@@ -55,7 +55,7 @@ pub async fn register_user_handler(
     let role_str = payload.role.unwrap_or_else(|| "customer".to_string());
     let role = UserRole::from(role_str.clone());
 
-    // 4. حفظ المستخدم الجديد في قاعدة البيانات
+    // 4. حفظ المستخدم الجديد في قاعدة البيانات والمطابقة عبر FromRow
     let user_record = sqlx::query_as::<_, UserResponse>(
         "INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) 
          RETURNING id, email, role, created_at"
@@ -65,9 +65,9 @@ pub async fn register_user_handler(
     .bind(role.to_string())
     .fetch_one(&pool)
     .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Database insertion failure: {}", e)))?;
 
-    // 5. توليد الـ JWT Token للمستخدم الجديد مباشرة
+    // 5. توليد الـ JWT Token للمخدم والمستخدم الجديد مباشرة
     let token = generate_jwt_token(&user_record.id.to_string(), &user_record.email, role)?;
 
     Ok((
@@ -95,14 +95,14 @@ pub async fn login_user_handler(
     State(pool): State<PgPool>,
     Json(payload): Json<LoginRequest>,
 ) -> Result<(StatusCode, Json<AuthResponse>), (StatusCode, String)> {
-    // 1. جلب بيانات المستخدم و كلمة المرور المشفرة من القاعدة
-    let row: (uuid::Uuid, String, String, chrono::DateTime<chrono::Utc>) = sqlx::query_as(
+    // 1. جلب بيانات المستخدم و كلمة المرور المشفرة من القاعدة (باستخدام query_as غير المقيد بـ Struct لتفكيك الـ Tuples بمرونة)
+    let row: (uuid::Uuid, String, String, String, chrono::DateTime<chrono::Utc>) = sqlx::query_as(
         "SELECT id, email, password_hash, role, created_at FROM users WHERE email = $1"
     )
     .bind(&payload.email)
     .fetch_optional(&pool)
     .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Database lookup failure: {}", e)))?
     .ok_or_else(|| (StatusCode::UNAUTHORIZED, "Invalid email or password".to_string()))?;
 
     let (user_id, email, db_password_hash, role_str, created_at) = row;
@@ -135,7 +135,7 @@ pub async fn login_user_handler(
     ))
 }
 
-/// دالة مساعدة داخلية لتوليد الـ JWT Token بأمان كامل
+/// دالة مساعدة داخلية لتوليد الـ JWT Token بأمان كامل وتوافق مع عائلة إصدارات jsonwebtoken 10.x
 fn generate_jwt_token(user_id: &str, email: &str, role: UserRole) -> Result<String, (StatusCode, String)> {
     let config = AppConfig::from_env();
     let expiration = Utc::now()
@@ -150,6 +150,7 @@ fn generate_jwt_token(user_id: &str, email: &str, role: UserRole) -> Result<Stri
         exp: expiration,
     };
 
+    // التعديل الهيكلي: تمرير مرجع للـ Header الافتراضي متوافقاً مع الميثودولوجيا الحديثة للمكتبة
     encode(
         &Header::default(),
         &claims,
