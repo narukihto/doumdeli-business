@@ -1,164 +1,159 @@
 use axum::{
     extract::State,
-    http::{StatusCode, HeaderMap},
+    http::StatusCode,
     Json,
 };
-use sqlx::{PgPool, Postgres, Transaction};
-use uuid::Uuid;
-use jsonwebtoken::{decode, DecodingKey, Validation};
-use rust_decimal::Decimal;
+use sqlx::PgPool;
+use argon2::{
+    password_hash::{rand_core::OsRng, PasswordHasher, PasswordVerifier, SaltString},
+    Argon2, PasswordHash,
+};
+use jsonwebtoken::{encode, Header, EncodingKey};
+use chrono::Utc;
 
-use crate::models::order::{CreateOrderRequest, OrderResponse, OrderItemResponse};
+use crate::models::user::{RegisterRequest, LoginRequest, AuthResponse, UserResponse};
 use crate::config::{AppConfig, Claims, UserRole};
 
-/// إنشاء طلب جديد ومعالجة عملية الشراء - متاح لجميع المستخدمين الموثقين
+/// تسجيل مستخدم جديد (Customer, Seller, Courier) وتشفير كلمة المرور
 #[utoipa::path(
     post,
-    path = "/orders",
-    request_body = CreateOrderRequest,
+    path = "/auth/register",
+    request_body = RegisterRequest,
     responses(
-        (status = 201, description = "Order placed successfully", body = OrderResponse),
-        (status = 400, description = "Bad Request - Out of stock or invalid data"),
-        (status = 401, description = "Unauthorized - Missing or invalid token"),
+        (status = 201, description = "User registered successfully", body = AuthResponse),
+        (status = 400, description = "Email already exists or invalid data"),
         (status = 500, description = "Internal server error")
     ),
     tag = "Doumdeli Business"
 )]
-pub async fn create_order_handler(
+pub async fn register_user_handler(
     State(pool): State<PgPool>,
-    headers: HeaderMap,
-    Json(payload): Json<CreateOrderRequest>,
-) -> Result<(StatusCode, Json<OrderResponse>), (StatusCode, String)> {
-    // 1. التحقق من الهوية واستخراج معرف المشتري عبر الـ JWT
-    let claims = authorize_customer(headers)?;
-    let customer_uuid = Uuid::parse_str(&claims.sub)
-        .map_err(|_| (StatusCode::BAD_REQUEST, "Invalid customer ID format within token".to_string()))?;
-
-    if payload.items.is_empty() {
-        return Err((StatusCode::BAD_REQUEST, "Order must contain at least one item".to_string()));
-    }
-
-    // 2. بدء معاملة آمنة (Database Transaction) لضمان تكامل البيانات وعمليات الخصم
-    let mut tx: Transaction<'_, Postgres> = pool
-        .begin()
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to start transaction: {}", e)))?;
-
-    let mut total_amount = Decimal::ZERO;
-    let mut order_items_to_insert = Vec::new();
-
-    // 3. التحقق من المخزون، جلب الأسعار الحقيقية، وحساب الإجمالي المالي بدقة
-    for item in &payload.items {
-        // جلب تفاصيل المنتج والتحقق من توفره داخل الـ Transaction (Row Locking لمنع الـ Race Conditions)
-        let product_row: (Decimal, i32) = sqlx::query_as(
-            "SELECT price, stock FROM products WHERE id = $1 FOR UPDATE"
-        )
-        .bind(item.product_id)
-        .fetch_optional(&mut *tx)
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Database query error: {}", e)))?
-        .ok_or_else(|| (StatusCode::BAD_REQUEST, format!("Product with ID {} not found", item.product_id)))?;
-
-        let (price, stock) = product_row;
-
-        if stock < item.quantity {
-            return Err((StatusCode::BAD_REQUEST, format!("Insufficient stock for product ID: {}", item.product_id)));
-        }
-
-        // تحديث المخزون وخصم الكمية المطلوبة فوراً
-        sqlx::query("UPDATE products SET stock = stock - $1 WHERE id = $2")
-            .bind(item.quantity)
-            .bind(item.product_id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to update stock: {}", e)))?;
-
-        // حساب التكلفة الجزئية والإجمالية
-        let item_total = price * Decimal::from(item.quantity);
-        total_amount += item_total;
-
-        order_items_to_insert.push((item.product_id, item.quantity, price));
-    }
-
-    // 4. تعيين مندوب توصيل محلي عشوائي متوفر للتوصيل (Courier Role Routing) لدعم الدفع عند الاستلام (COD)
-    let courier_id: Option<Uuid> = sqlx::query_scalar(
-        "SELECT id FROM users WHERE role = 'courier' LIMIT 1"
+    Json(payload): Json<RegisterRequest>,
+) -> Result<(StatusCode, Json<AuthResponse>), (StatusCode, String)> {
+    // 1. التحقق من عدم تكرار البريد الإلكتروني
+    let email_exists = sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)"
     )
-    .fetch_optional(&mut *tx)
+    .bind(&payload.email)
+    .fetch_one(&pool)
     .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to route courier: {}", e)))?;
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
-    // 5. إدخال سجل الطلب الرئيسي (Order Master)
-    let order_id: Uuid = sqlx::query_scalar(
-        "INSERT INTO orders (customer_id, total_amount, status, payment_method, courier_id)
-         VALUES ($1, $2, 'pending', 'cod', $3)
-         RETURNING id"
-    )
-    .bind(customer_uuid)
-    .bind(total_amount)
-    .bind(courier_id)
-    .fetch_one(&mut *tx)
-    .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to insert order: {}", e)))?;
-
-    // 6. إدخال عناصر الطلب تفصيلياً (Order Items Details)
-    let mut inserted_items = Vec::new();
-    for (product_id, quantity, price_at_purchase) in order_items_to_insert {
-        let item_response = sqlx::query_as::<_, OrderItemResponse>(
-            "INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase)
-             VALUES ($1, $2, $3, $4)
-             RETURNING id, order_id, product_id, quantity, price_at_purchase"
-        )
-        .bind(order_id)
-        .bind(product_id)
-        .bind(quantity)
-        .bind(price_at_purchase)
-        .fetch_one(&mut *tx)
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to insert order item: {}", e)))?;
-
-        inserted_items.push(item_response);
+    if email_exists {
+        return Err((StatusCode::BAD_REQUEST, "Email is already registered".to_string()));
     }
 
-    // اعتماد وإغلاق المعاملة بنجاح (Commit Transaction)
-    tx.commit()
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Transaction commit failure: {}", e)))?;
+    // 2. تشفير كلمة المرور باستخدام Argon2
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+    let password_hash = argon2
+        .hash_password(payload.password.as_bytes(), &salt)
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to hash password".to_string()))?
+        .to_string();
 
-    // 7. بناء الرد النهائي المكتمل لطلب الـ Checkout
-    let order_response = OrderResponse {
-        id: order_id,
-        customer_id: customer_uuid,
-        total_amount,
-        status: "pending".to_string(),
-        payment_method: "cod".to_string(),
-        courier_id,
-        items: inserted_items,
-    };
+    // 3. تحديد الدور (Role) الافتراضي أو المدخل
+    let role_str = payload.role.unwrap_or_else(|| "customer".to_string());
+    let role = UserRole::from(role_str.clone());
 
-    Ok((StatusCode::CREATED, Json(order_response)))
+    // 4. حفظ المستخدم الجديد في قاعدة البيانات
+    let user_record = sqlx::query_as::<_, UserResponse>(
+        "INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) 
+         RETURNING id, email, role, created_at"
+    )
+    .bind(&payload.email)
+    .bind(password_hash)
+    .bind(role.to_string())
+    .fetch_one(&pool)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    // 5. توليد الـ JWT Token للمستخدم الجديد مباشرة
+    let token = generate_jwt_token(&user_record.id.to_string(), &user_record.email, role)?;
+
+    Ok((
+        StatusCode::CREATED,
+        Json(AuthResponse {
+            token,
+            user: user_record,
+        }),
+    ))
 }
 
-/// دالة مساعدة مخصصة للتحقق من هوية المشترين أو صلاحيات الإدارة للعمليات المالية
-fn authorize_customer(headers: HeaderMap) -> Result<Claims, (StatusCode, String)> {
-    let auth_header = headers
-        .get("Authorization")
-        .and_then(|h| h.to_str().ok())
-        .ok_or_else(|| (StatusCode::UNAUTHORIZED, "Missing Authorization header".to_string()))?;
-
-    if !auth_header.starts_with("Bearer ") {
-        return Err((StatusCode::UNAUTHORIZED, "Invalid Authorization format".to_string()));
-    }
-
-    let token = &auth_header[7..];
-    let config = AppConfig::from_env();
-
-    let token_data = decode::<Claims>(
-        token,
-        &DecodingKey::from_secret(config.jwt_secret.as_bytes()),
-        &Validation::default(),
+/// تسجيل الدخول والتحقق من الهوية والصلاحيات
+#[utoipa::path(
+    post,
+    path = "/auth/login",
+    request_body = LoginRequest,
+    responses(
+        (status = 200, description = "Login successful", body = AuthResponse),
+        (status = 401, description = "Invalid email or password"),
+        (status = 500, description = "Internal server error")
+    ),
+    tag = "Doumdeli Business"
+)]
+pub async fn login_user_handler(
+    State(pool): State<PgPool>,
+    Json(payload): Json<LoginRequest>,
+) -> Result<(StatusCode, Json<AuthResponse>), (StatusCode, String)> {
+    // 1. جلب بيانات المستخدم و كلمة المرور المشفرة من القاعدة
+    let row: (uuid::Uuid, String, String, chrono::DateTime<chrono::Utc>) = sqlx::query_as(
+        "SELECT id, email, password_hash, role, created_at FROM users WHERE email = $1"
     )
-    .map_err(|_| (StatusCode::UNAUTHORIZED, "Invalid or expired token".to_string()))?;
+    .bind(&payload.email)
+    .fetch_optional(&pool)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
+    .ok_or_else(|| (StatusCode::UNAUTHORIZED, "Invalid email or password".to_string()))?;
 
-    Ok(token_data.claims)
+    let (user_id, email, db_password_hash, role_str, created_at) = row;
+    let role = UserRole::from(role_str.clone());
+
+    // 2. التحقق من صحة كلمة المرور باستخدام Argon2
+    let parsed_hash = PasswordHash::new(&db_password_hash)
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Invalid password hash format in DB".to_string()))?;
+
+    Argon2::default()
+        .verify_password(payload.password.as_bytes(), &parsed_hash)
+        .map_err(|_| (StatusCode::UNAUTHORIZED, "Invalid email or password".to_string()))?;
+
+    // 3. توليد الـ JWT Token للمستخدم
+    let token = generate_jwt_token(&user_id.to_string(), &email, role)?;
+
+    let user_response = UserResponse {
+        id: user_id,
+        email,
+        role: role_str,
+        created_at,
+    };
+
+    Ok((
+        StatusCode::OK,
+        Json(AuthResponse {
+            token,
+            user: user_response,
+        }),
+    ))
+}
+
+/// دالة مساعدة داخلية لتوليد الـ JWT Token بأمان كامل
+fn generate_jwt_token(user_id: &str, email: &str, role: UserRole) -> Result<String, (StatusCode, String)> {
+    let config = AppConfig::from_env();
+    let expiration = Utc::now()
+        .checked_add_signed(chrono::Duration::minutes(config.jwt_lifetime_minutes))
+        .expect("valid timestamp")
+        .timestamp() as usize;
+
+    let claims = Claims {
+        sub: user_id.to_string(),
+        email: email.to_string(),
+        role,
+        exp: expiration,
+    };
+
+    encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(config.jwt_secret.as_bytes()),
+    )
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to generate token: {}", e)))
 }
