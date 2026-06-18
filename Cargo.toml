@@ -4,11 +4,6 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Senior Rust Backend Engineer"]
 
-# إخبار المترجم بأن المشروع يحتوي على مكتبة داخلية لكي تقرأها ملفات الـ tests
-[lib]
-name = "doumdeli_business"
-path = "src/main.rs" # أو إذا كانت بنيتك تعتمد على تحويل main لـ lib فرعي
-
 [dependencies]
 # Web Framework & Async Runtime
 axum = { version = "0.7.5", features = ["macros"] }
@@ -22,11 +17,11 @@ uuid = { version = "1.9.1", features = ["serde", "v4"] }
 
 # Math & Money Handling
 rust_decimal = { version = "1.35.0", features = ["serde-float"] }
-# إضافة مكتبة الماكرو لحل خطأ unresolved import `rust_decimal_macros`
 rust_decimal_macros = "1.35.0"
 
 # Authentication & Security
-jsonwebtoken = "10.3.0"
+# تم حل خطأ الـ CryptoProvider بتفعيل ميزة rust_crypto صراحة هنا
+jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 argon2 = "0.5.3"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.120"
