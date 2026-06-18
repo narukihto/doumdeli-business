@@ -4,8 +4,9 @@ use axum::{
 };
 use sqlx::PgPool;
 use utoipa::OpenApi;
-// تم تصحيح الاسم هنا باستبدال الشرطة الوسطى بشرطة سفلية ليتوافق مع معايير الرست
 use utoipa_swagger_ui::SwaggerUi;
+// استيراد ميزة خدمة الملفات الساكنة محلياً للتطوير
+use tower_http::services::ServeDir;
 
 use crate::handlers::{auth_handler, product_handler, order_handler};
 
@@ -51,13 +52,15 @@ pub fn configure_routes(db_pool: PgPool) -> Router {
     let order_routes = Router::new()
         .route("/orders", post(order_handler::create_order_handler));
 
-    // 4. دمج كافة المسارات في راوتر موحد وتمرير الـ DbPool كـ State
+    // 4. دمج كافة المسارات وتمرير الـ DbPool كـ State مع خدمة مجلد الويب الفضائي
     Router::new()
         .route("/health", get(health_check))
         .merge(auth_routes)
         .merge(product_routes)
         .merge(order_routes)
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        // تشغيل واجهة المتجر محلياً من مجلد web عند الدخول على الرابط الأساسي
+        .nest_service("/", ServeDir::new("web"))
         .with_state(db_pool)
 }
 
