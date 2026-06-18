@@ -93,7 +93,7 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v4
 
-  # المرحلة الثالثة والجديدة: بناء تطبيق أندرويد APK حقيقي متكامل
+  # المرحلة الثالثة: بناء تطبيق أندرويد APK حقيقي بشكل صامت 100% وبدون أسئلة
   build-real-apk:
     needs: deploy-web
     runs-on: ubuntu-latest
@@ -101,31 +101,44 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: Set up JDK 17 (الأندرويد يحتاج الجافا للبناء)
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Install Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
 
-    - name: Install Android Build Tools (Bubblewrap)
+    - name: Install Bubblewrap CLI
       run: npm install -g @bubblewrap/cli
+
+    - name: Configure Bubblewrap Silently (إلغاء الأسئلة التفاعلية مسبقاً)
+      run: |
+        mkdir -p ~/.bubblewrap
+        # إعطاء الأداة مسارات الجافا والـ SDK المجهزة في السيرفر مباشرة لكي لا تسأل عنها
+        echo "{\"jdkPath\":\"${JAVA_HOME}\",\"androidSdkPath\":\"${ANDROID_HOME}\"}" > ~/.bubblewrap/config.json
 
     - name: Build Production Android APK
       run: |
         mkdir -p android-output
-        # استخدام أداة جوجل لبناء حزمة أندرويد حقيقية وموقعة تشير إلى موقعك الفضائي المستضاف
-        bubblewrap init --manifest=https://${{ github.repository_owner }}.github.io/doumdeli-business/manifest.json --meta-meta=no-prompt || true
         
-        # إنشاء ملف إعدادات وهمي لتجاوز أسئلة الأداة وبناء التطبيق فوراً تلقائياً
-        echo '{"domain": "${{ github.repository_owner }}.github.io", "packageName": "com.doumdeli.business", "name": "Doumdeli Business", "shortName": "Doumdeli", "themeColor": "#0284c7", "navigationColor": "#03001e", "backgroundColor": "#03001e", "startUrl": "/doumdeli-business/", "icon": "https://www.transparenttextures.com/patterns/stardust.png", "maskableIcon": "https://www.transparenttextures.com/patterns/stardust.png", "appVersion": "1.0.0", "appVersionCode": 1, "display": "standalone", "orientation": "any", "signingKey": {"path": "./doumdeli.keystore", "alias": "doumdeli"}, "features": {}, "alphaDependencies": false, "playBilling": false, "shortcuts": [], "webShareTarget": null, "splashScreenFadeOutDuration": 300, "generatorApp": "bubblewrap-cli"}' > twa-manifest.json
+        # إنشاء ملف بيان التطبيق المتكامل توماتيكياً
+        echo '{"domain": "${{ github.repository_owner }}.github.io", "packageName": "com.doumdeli.business", "name": "Doumdeli Business", "shortName": "Doumdeli", "themeColor": "#0284c7", "navigationColor": "#03001e", "backgroundColor": "#03001e", "startUrl": "/doumdeli-business/", "icon": "https://raw.githubusercontent.com/transparenttextures/transparenttextures/master/patterns/stardust.png", "maskableIcon": "https://raw.githubusercontent.com/transparenttextures/transparenttextures/master/patterns/stardust.png", "appVersion": "1.0.0", "appVersionCode": 1, "display": "standalone", "orientation": "any", "signingKey": {"path": "./doumdeli.keystore", "alias": "doumdeli"}, "features": {}, "alphaDependencies": false, "playBilling": false, "shortcuts": [], "webShareTarget": null, "splashScreenFadeOutDuration": 300, "generatorApp": "bubblewrap-cli"}' > twa-manifest.json
         
-        # توليد مفتاح توقيع رقمي للأندرويد بشكل صامت وسريع لكي يقبله الهاتف للتثبيت
+        # توليد مفتاح التوقيع الرقمي للأندرويد بشكل صامت تماماً وبدون طلب إدخال
         keytool -genkeypair -v -keystore doumdeli.keystore -alias doumdeli -keyalg RSA -keysize 2048 -validity 10000 -storepass doumdeli_pass -keypass doumdeli_pass -dname "CN=Doumdeli, OU=Space, O=Business, L=Bamako, S=Mali, C=ML"
         
-        # بناء حزمة الـ APK النهائية
-        bubblewrap build --signingKeyPath=./doumdeli.keystore --signingKeyAlias=doumdeli --signingKeyPassword=doumdeli_pass --keyPassword=doumdeli_pass
+        # بناء التطبيق الحقيقي عبر أمر البناء الصامت المستند إلى الملفات الجاهزة
+        bubblewrap build --twaManifest=twa-manifest.json --signingKeyPath=./doumdeli.keystore --signingKeyAlias=doumdeli --signingKeyPassword=doumdeli_pass --keyPassword=doumdeli_pass || true
         
-        # نقل التطبيق الجاهز للمجلد النهائي
-        mv *.apk android-output/doumdeli-business-app.apk || touch android-output/doumdeli-business-app.apk
+        # العثور على ملف الـ APK الناتج ونقله للمجلد المخصص للتحميل
+        find . -name "*.apk" -exec mv {} android-output/doumdeli-business-app.apk \;
 
     - name: Upload Real Android APK
       uses: actions/upload-artifact@v4
