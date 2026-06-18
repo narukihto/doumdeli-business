@@ -4,7 +4,8 @@ use axum::{
 };
 use sqlx::PgPool;
 use utoipa::OpenApi;
-use utoipa_swagger-ui::SwaggerUi;
+// تم تصحيح الاسم هنا باستبدال الشرطة الوسطى بشرطة سفلية ليتوافق مع معايير الرست
+use utoipa_swagger_ui::SwaggerUi;
 
 use crate::handlers::{auth_handler, product_handler, order_handler};
 
