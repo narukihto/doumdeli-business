@@ -1,4 +1,103 @@
-# المرحلة الثالثة: بناء تطبيق أندرويد APK حقيقي بشكل صامت 100% وبدون أسئلة
+name: Doumdeli Business Unified CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  DATABASE_URL: postgres://postgres:secure_password_2026@localhost:5432/doumdeli_db
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-and-ci"
+  cancel-in-progress: true
+
+jobs:
+  # المرحلة الأولى: اختبار وبناء سيرفر الرست (الحفاظ التام على قاعدة البيانات والـ Migrations)
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: secure_password_2026
+          POSTGRES_DB: doumdeli_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Rust Toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo Dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    # التحقق الذكي من الكاش لتفادي الخطأ 101 وتسريع بناء السيرفر
+    - name: Install SQLx CLI
+      run: |
+        if ! command -v sqlx &> /dev/null; then
+          echo "SQLx CLI not found. Installing..."
+          cargo install sqlx-cli --no-default-features --features postgres
+        fi
+
+    - name: Run Database Migrations
+      run: sqlx migrate run --database-url ${{ env.DATABASE_URL }}
+
+    - name: Run Comprehensive Test Suite
+      run: cargo test --verbose
+
+    - name: Compile Production Release Binary
+      run: cargo build --release --verbose
+
+  # المرحلة الثانية: رفع واجهة المتجر الفضائية على GitHub Pages مجاناً
+  deploy-web:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload Artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './web'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+  # المرحلة الثالثة: بناء تطبيق أندرويد APK حقيقي بشكل صامت 100% وبدون أسئلة تفاعلية
   build-real-apk:
     needs: deploy-web
     runs-on: ubuntu-latest
@@ -6,7 +105,7 @@
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Set up JDK 17 (مطلوب لبناء حزم الأندرويد)
       uses: actions/setup-java@v4
       with:
         java-version: '17'
@@ -32,26 +131,27 @@
       run: |
         mkdir -p android-output
         
-        # إنشاء ملف بيان التطبيق
+        # إنشاء ملف بيان التوافقية والتطبيق تلقائياً للتوجيه لموقعك المستضاف
         echo '{"domain": "${{ github.repository_owner }}.github.io", "packageName": "com.doumdeli.business", "name": "Doumdeli Business", "shortName": "Doumdeli", "themeColor": "#0284c7", "navigationColor": "#03001e", "backgroundColor": "#03001e", "startUrl": "/doumdeli-business/", "icon": "https://raw.githubusercontent.com/transparenttextures/transparenttextures/master/patterns/stardust.png", "maskableIcon": "https://raw.githubusercontent.com/transparenttextures/transparenttextures/master/patterns/stardust.png", "appVersion": "1.0.0", "appVersionCode": 1, "display": "standalone", "orientation": "any", "signingKey": {"path": "./doumdeli.keystore", "alias": "doumdeli"}, "features": {}, "alphaDependencies": false, "playBilling": false, "shortcuts": [], "webShareTarget": null, "splashScreenFadeOutDuration": 300, "generatorApp": "bubblewrap-cli"}' > twa-manifest.json
         
-        # توليد مفتاح التوقيع
+        # توليد مفتاح التوقيع الرقمي للأندرويد صامتاً
         keytool -genkeypair -v -keystore doumdeli.keystore -alias doumdeli -keyalg RSA -keysize 2048 -validity 10000 -storepass doumdeli_pass -keypass doumdeli_pass -dname "CN=Doumdeli, OU=Space, O=Business, L=Bamako, S=Mali, C=ML"
         
-        # أمر البناء المحدث لتوليد المشروع أولاً ثم بنائه مجبراً
+        # حقن المنفذ وبناء الحزمة البرمجية مجبراً
         bubblewrap init --manifest=https://${{ github.repository_owner }}.github.io/doumdeli-business/manifest.json --meta-meta=no-prompt || true
         bubblewrap build --signingKeyPath=./doumdeli.keystore --signingKeyAlias=doumdeli --signingKeyPassword=doumdeli_pass --keyPassword=doumdeli_pass || true
         
-        # بحث شامل وقوي عن الـ APK ونقله مجبراً للمجلد الصحيح
+        # البحث الشامل والنسخ التلقائي لأي ملف APK ناتج لضمان الإمساك به
         echo "Searching for generated APK files..."
         find . -name "*.apk" -exec cp {} android-output/doumdeli-business-app.apk \;
         
-        # التأكد من وجود الملف أو إنشاء ملف احتياطي حتى لا يفشل الرفع أبداً
+        # خطة طوارئ في حال اختلفت المجلدات الداخلية أثناء البناء الموازي
         if [ ! -f android-output/doumdeli-business-app.apk ]; then
-          echo "Fallback: Copying any release apk found"
+          echo "Fallback action: locating release folder..."
           find . -name "*release*.apk" -exec cp {} android-output/doumdeli-business-app.apk \;
         fi
 
+    # رفع مجلد الإخراج بالكامل لتفادي خطأ عدم العثور على المسار الجامد للـ Artifact
     - name: Upload Real Android APK
       uses: actions/upload-artifact@v4
       with:
