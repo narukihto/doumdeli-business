@@ -26,13 +26,12 @@ serde_json = "1.0.120"
 
 # Documentation & API Specs
 utoipa = { version = "4.2.3", features = ["axum_extras", "chrono", "uuid", "decimal"] }
-# تم تصحيح الاسم هنا برمجياً ليتطابق مع الاستدعاء في الكود
-utoipa-swagger-ui = { version = "7.1.0", package = "utoipa-swagger-ui" }
+# حل مشكلة الـ unresolved import بتفعيل الـ axum feature للسواجر
+utoipa-swagger-ui = { version = "7.1.0", features = ["axum"] }
 
 # Utilities
 dotenvy = "0.15.7"
 tracing = "0.1.40"
-# تم إضافة الفيتشر env-filter هنا لحل مشكلة الـ EnvFilter المفقود في main.rs
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 
 [dev-dependencies]
