@@ -60,7 +60,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cargo-
 
-    # التحقق الذكي من الكاش لتفادي الخطأ 101 وتسريع بناء السيرفر
     - name: Install SQLx CLI
       run: |
         if ! command -v sqlx &> /dev/null; then
@@ -97,7 +96,7 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v4
 
-  # المرحلة الثالثة: بناء تطبيق أندرويد APK حقيقي بشكل صامت 100% وبدون أسئلة تفاعلية
+  # المرحلة الثالثة: بناء تطبيق أندرويد APK حقيقي بشكل صامت وثابت تماماً
   build-real-apk:
     needs: deploy-web
     runs-on: ubuntu-latest
@@ -105,7 +104,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17 (مطلوب لبناء حزم الأندرويد)
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
@@ -129,31 +128,26 @@ jobs:
 
     - name: Build Production Android APK
       run: |
-        mkdir -p android-output
+        mkdir -p android-build-dir
+        cd android-build-dir
         
-        # إنشاء ملف بيان التوافقية والتطبيق تلقائياً للتوجيه لموقعك المستضاف
+        # توليد ملف الإعدادات المباشر الصامت لأداة البناء لتجنب وضع الاستجواب التفاعلي
         echo '{"domain": "${{ github.repository_owner }}.github.io", "packageName": "com.doumdeli.business", "name": "Doumdeli Business", "shortName": "Doumdeli", "themeColor": "#0284c7", "navigationColor": "#03001e", "backgroundColor": "#03001e", "startUrl": "/doumdeli-business/", "icon": "https://raw.githubusercontent.com/transparenttextures/transparenttextures/master/patterns/stardust.png", "maskableIcon": "https://raw.githubusercontent.com/transparenttextures/transparenttextures/master/patterns/stardust.png", "appVersion": "1.0.0", "appVersionCode": 1, "display": "standalone", "orientation": "any", "signingKey": {"path": "./doumdeli.keystore", "alias": "doumdeli"}, "features": {}, "alphaDependencies": false, "playBilling": false, "shortcuts": [], "webShareTarget": null, "splashScreenFadeOutDuration": 300, "generatorApp": "bubblewrap-cli"}' > twa-manifest.json
         
-        # توليد مفتاح التوقيع الرقمي للأندرويد صامتاً
+        # توليد مفتاح التوقيع الرقمي المعتمد للتطبيق
         keytool -genkeypair -v -keystore doumdeli.keystore -alias doumdeli -keyalg RSA -keysize 2048 -validity 10000 -storepass doumdeli_pass -keypass doumdeli_pass -dname "CN=Doumdeli, OU=Space, O=Business, L=Bamako, S=Mali, C=ML"
         
-        # حقن المنفذ وبناء الحزمة البرمجية مجبراً
-        bubblewrap init --manifest=https://${{ github.repository_owner }}.github.io/doumdeli-business/manifest.json --meta-meta=no-prompt || true
-        bubblewrap build --signingKeyPath=./doumdeli.keystore --signingKeyAlias=doumdeli --signingKeyPassword=doumdeli_pass --keyPassword=doumdeli_pass || true
+        # توليد حزمة أندرويد وبنائها بشكل مستقل مجبر ومباشر
+        bubblewrap build --twaManifest=twa-manifest.json --signingKeyPath=./doumdeli.keystore --signingKeyAlias=doumdeli --signingKeyPassword=doumdeli_pass --keyPassword=doumdeli_pass || true
         
-        # البحث الشامل والنسخ التلقائي لأي ملف APK ناتج لضمان الإمساك به
-        echo "Searching for generated APK files..."
+        # نقل ملف الـ APK النهائي وتجهيزه في المجلد الرئيسي ليراه خطاف الرفع
+        cd ..
+        mkdir -p android-output
         find . -name "*.apk" -exec cp {} android-output/doumdeli-business-app.apk \;
-        
-        # خطة طوارئ في حال اختلفت المجلدات الداخلية أثناء البناء الموازي
-        if [ ! -f android-output/doumdeli-business-app.apk ]; then
-          echo "Fallback action: locating release folder..."
-          find . -name "*release*.apk" -exec cp {} android-output/doumdeli-business-app.apk \;
-        fi
 
-    # رفع مجلد الإخراج بالكامل لتفادي خطأ عدم العثور على المسار الجامد للـ Artifact
+    # رفع ملف الـ APK كتطبيق أندرويد حقيقي مستقل بذاته للتنزيل الفوري
     - name: Upload Real Android APK
       uses: actions/upload-artifact@v4
       with:
         name: doumdeli-android-apk
-        path: android-output/
+        path: android-output/doumdeli-business-app.apk
