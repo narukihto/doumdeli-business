@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # المرحلة الأولى: اختبار وبناء سيرفر الرست (الحفاظ التام على عملك السابق)
+  # المرحلة الأولى: اختبار وبناء سيرفر الرست
   test-and-build:
     runs-on: ubuntu-latest
 
@@ -59,8 +59,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cargo-
 
+    # الحل الأفضل والذكي: التحقق من الـ Cache قبل التثبيت لمنع الخطأ 101 وتسريع الـ Pipeline
     - name: Install SQLx CLI
-      run: cargo install sqlx-cli --no-default-features --features postgres
+      run: |
+        if ! command -v sqlx &> /dev/null; then
+          echo "SQLx CLI not found. Installing..."
+          cargo install sqlx-cli --no-default-features --features postgres
+        else
+          echo "SQLx CLI is already installed and restored from cache!"
+        fi
 
     - name: Run Database Migrations
       run: sqlx migrate run --database-url ${{ env.DATABASE_URL }}
@@ -71,7 +78,7 @@ jobs:
     - name: Compile Production Release Binary
       run: cargo build --release --verbose
 
-  # المرحلة الثانية: رفع واجهة المتجر الفضائية على GitHub Pages مجاناً
+  # المرحلة الثانية: رفع واجهة المتجر الفضائية على GitHub Pages تلقائياً فور نجاح الاختبارات
   deploy-web:
     needs: test-and-build
     runs-on: ubuntu-latest
