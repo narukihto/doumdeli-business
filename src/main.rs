@@ -1,15 +1,17 @@
-use axum::{routing::get, Router};
+use axum::Router;
 use std::net::SocketAddr;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod config;
-mod routes;
-mod handlers;
-mod models;
+// جعل الموديولات عامة (pub mod) لتتمكن ملفات الاختبارات (Integration Tests) من الوصول إليها
+pub mod config;
+pub mod routes;
+pub mod handlers;
+pub mod models;
+pub mod services;
 
 #[tokio::main]
 async fn main() {
-    // 1. تهيئة نظام التتبع وتسجيل الأحداث (Tracing & Logging)
+    // 1. تهيئة نظام التتبع وتسجيل الأحداث (Tracing & Logging) مع تفعيل الـ EnvFilter المحدث
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
@@ -34,8 +36,7 @@ async fn main() {
         .await
         .expect("Failed to create PostgreSQL connection pool");
 
-    // 4. بناء الـ Router الرئيسي وربطه بـ State المشتركة (Database Pool)
-    // ملاحظة: قمنا بإنشاء مسار تجريبي سريع للتحقق من عمل السيرفر حتى نكتب ملف الـ routes كاملاً
+    // 4. بناء الـ Router الرئيسي ودمج كافة المسارات المهيأة
     let app = Router::new()
         .merge(routes::configure_routes(db_pool.clone()))
         .layer(tower_http::trace::TraceLayer::new_for_http());
@@ -45,11 +46,11 @@ async fn main() {
         .unwrap_or_else(|_| "8080".to_string())
         .parse::<u16>()
         .expect("PORT must be a valid number");
-    
+
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     tracing::info!("Doumdeli Business Server is running successfully on {}", addr);
 
-    // 6. تشغيل سيرفر Axum باستخدام Tokio Listener
+    // 6. تشغيل سيرفر Axum باستخدام Tokio Listener المحدث لـ Axum 0.7
     let listener = tokio::net::TcpListener::bind(&addr)
         .await
         .unwrap_or_else(|e| panic!("Failed to bind to port {}: {}", port, e));
