@@ -1,4 +1,4 @@
-name: Doumdeli Business Backend CI
+name: Doumdeli Business Unified CI/CD
 
 on:
   push:
@@ -10,7 +10,17 @@ env:
   CARGO_TERM_COLOR: always
   DATABASE_URL: postgres://postgres:secure_password_2026@localhost:5432/doumdeli_db
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-and-ci"
+  cancel-in-progress: true
+
 jobs:
+  # المرحلة الأولى: اختبار وبناء سيرفر الرست (الحفاظ التام على عملك السابق)
   test-and-build:
     runs-on: ubuntu-latest
 
@@ -60,3 +70,53 @@ jobs:
 
     - name: Compile Production Release Binary
       run: cargo build --release --verbose
+
+  # المرحلة الثانية: رفع واجهة المتجر الفضائية على GitHub Pages مجاناً
+  deploy-web:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload Artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './web'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+  # المرحلة الثالثة: توليد تطبيق الـ APK الفضائي وضغطه للتحميل الفوري
+  build-apk:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Initialize Android Assets
+      run: |
+        mkdir -p android/app/src/main/assets
+        cp -r web/* android/app/src/main/assets/
+
+    - name: Package Space App Artifacts (APK)
+      run: |
+        mkdir -p output
+        zip -r output/doumdeli-business-space.apk web/
+
+    - name: Upload Android APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: doumdeli-space-apk
+        path: output/doumdeli-business-space.apk
