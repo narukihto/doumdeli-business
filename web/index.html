@@ -13,11 +13,27 @@
         .neon-glow { text-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.4); }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .space-gradient { background: radial-gradient(circle at top, #0b112c 0%, #03001e 100%); }
+        
+        /* تأثير حركة شريط الإعلانات العلوي */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee { animation: marquee 25s linear infinite; }
     </style>
 </head>
 <body class="space-gradient min-h-screen text-gray-100 overflow-x-hidden relative">
 
     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-40 pointer-events-none"></div>
+
+    <div class="w-full bg-gradient-to-r from-blue-950 via-indigo-900 to-cyan-950 text-white text-[11px] font-bold cosmic-font tracking-widest py-2 border-b border-cyan-500/20 overflow-hidden relative z-50">
+        <div class="whitespace-nowrap flex animate-marquee space-x-10">
+            <span>🚀 LIVRAISON RAPIDE À BAMAKO EN MOINS DE 24 HEURES</span>
+            <span>⚡ SYSTEME CASH ON DELIVERY (COD) : PAYEZ APRÈS VÉRIFICATION</span>
+            <span>🌌 INUTILE DE CHERCHER AILLEURS, LES MEILLEURS PRODUITS SONT DANS LA DIMENSION DOUMDELI</span>
+            <span>🛸 ASSISTANCE CLIENTS DISPONIBLE SUR WHATSAPP</span>
+        </div>
+    </div>
 
     <header class="glass-card sticky top-0 z-50 px-6 py-4 shadow-2xl border-b border-blue-900/30">
         <div class="container mx-auto flex justify-between items-center">
@@ -27,15 +43,23 @@
                     DOUMDELI BUSINESS
                 </h1>
             </div>
-            <div class="glass-card bg-blue-950/40 px-4 py-2 rounded-full border border-cyan-500/30 flex items-center space-x-3 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                <span class="text-cyan-400">🛒 Panier:</span>
-                <span id="cart-count" class="bg-gradient-to-r from-blue-500 to-cyan-500 px-2.5 py-0.5 text-xs font-bold rounded-full cosmic-font shadow-lg">0</span>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-2 bg-slate-950/60 px-3 py-1.5 rounded-full border border-green-500/20 text-[10px] cosmic-font text-green-400">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+                    <span>DEPOT SYNC ACTIVATED</span>
+                </div>
+                
+                <div class="glass-card bg-blue-950/40 px-4 py-2 rounded-full border border-cyan-500/30 flex items-center space-x-3 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <span class="text-cyan-400">🛒 Panier:</span>
+                    <span id="cart-count" class="bg-gradient-to-r from-blue-500 to-cyan-500 px-2.5 py-0.5 text-xs font-bold rounded-full cosmic-font shadow-lg">0</span>
+                </div>
             </div>
         </div>
     </header>
 
     <section class="container mx-auto mt-8 px-4">
-        <div class="relative glass-card rounded-3xl p-8 md:p-12 overflow-hidden shadow-[0_0_50px_rgba(30,58,138,0.3)] border border-blue-500/20 bg-gradient-to-br from-indigo-950/40 via-purple-950/10 to-black/50 text-center">
+        <div class="relative glass-card rounded-3xl p-8 md:p-14 overflow-hidden shadow-[0_0_50px_rgba(30,58,138,0.3)] border border-blue-500/20 bg-gradient-to-br from-indigo-950/40 via-purple-950/10 to-black/50 text-center">
             <div class="absolute -top-24 -left-24 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -43,13 +67,46 @@
             <h2 class="cosmic-font text-4xl md:text-6xl font-black mb-4 tracking-tight bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent">
                 Explorez la Dimension Doumdeli
             </h2>
-            <p class="text-gray-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+            <p class="text-gray-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed mb-6">
                 Des produits d'exception livrés à la vitesse de la lumière. Commandez maintenant en toute sécurité et payez à la livraison partout au Mali.
             </p>
+            <div class="flex justify-center">
+                <a href="#catalog-section" class="cosmic-font text-[11px] bg-blue-600/20 hover:bg-blue-600/40 text-cyan-300 border border-cyan-500/30 px-6 py-2.5 rounded-full transition duration-300 tracking-widest uppercase">
+                    Découvrir le Catalogue ↓
+                </a>
+            </div>
         </div>
     </section>
 
-    <section class="container mx-auto mt-10 px-4 text-center">
+    <section class="container mx-auto mt-12 px-4 max-w-5xl">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-card p-4 rounded-2xl border border-blue-500/10 text-center hover:border-blue-500/30 transition">
+                <span class="text-2xl block mb-2">🤝</span>
+                <h4 class="cosmic-font text-xs font-bold text-slate-200 mb-1">Paiement à la Livraison</h4>
+                <p class="text-[10px] text-gray-400">Payez en espèces après vérification à Bamako</p>
+            </div>
+            <div class="glass-card p-4 rounded-2xl border border-blue-500/10 text-center hover:border-cyan-500/30 transition">
+                <span class="text-2xl block mb-2">⚡</span>
+                <h4 class="cosmic-font text-xs font-bold text-slate-200 mb-1">Livraison Éclair</h4>
+                <p class="text-[10px] text-gray-400">Expédition rapide à votre porte en 24h</p>
+            </div>
+            <div class="glass-card p-4 rounded-2xl border border-blue-500/10 text-center hover:border-indigo-500/30 transition">
+                <span class="text-2xl block mb-2">🛡️</span>
+                <h4 class="cosmic-font text-xs font-bold text-slate-200 mb-1">Qualité Garantie</h4>
+                <p class="text-[10px] text-gray-400">Tous nos articles sont testés et certifiés</p>
+            </div>
+            <div class="glass-card p-4 rounded-2xl border border-blue-500/10 text-center hover:border-purple-500/30 transition">
+                <span class="text-2xl block mb-2">🛸</span>
+                <h4 class="cosmic-font text-xs font-bold text-slate-200 mb-1">Support Cosmique</h4>
+                <p class="text-[10px] text-gray-400">Assistance client en continu via WhatsApp</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="catalog-section" class="container mx-auto mt-16 px-4 text-center">
+        <span class="cosmic-font text-[10px] tracking-[0.3em] text-blue-400 font-bold block mb-2">SELECTION DIMENSIONNELLE</span>
+        <h3 class="cosmic-font text-xl md:text-2xl font-black mb-6 tracking-wider">CATALOGUE DES PRODUITS ULTRA-TENDANCE (FCFA)</h3>
+        
         <div class="inline-flex flex-wrap justify-center gap-3 p-2 rounded-2xl glass-card bg-slate-950/40 border border-white/5">
             <button onclick="filterCategory('TOUT')" id="btn-tout" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg">
                 🚀 TOUT EXPLORER
@@ -66,11 +123,11 @@
         </div>
     </section>
 
-    <main class="container mx-auto p-6 mt-6">
+    <main class="container mx-auto p-6 mt-2">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
             </div>
 
-        <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div class="mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto pt-10 border-t border-blue-900/20">
 
             <div class="glass-card p-6 rounded-3xl border border-cyan-500/20 bg-gradient-to-b from-blue-950/30 to-black/80 shadow-xl flex flex-col justify-between">
                 <div>
@@ -79,8 +136,8 @@
                     <div class="w-full h-px bg-white/10 my-3"></div>
                     <p class="text-xs text-cyan-300/80 mb-4 font-mono">Articles sélectionnés: <span id="selected-items-list" class="text-white font-sans text-xs">Aucun produit</span></p>
                 </div>
-                <p class="text-[11px] text-gray-400 leading-relaxed bg-blue-950/40 p-3 rounded-xl border border-blue-900/40">
-                    🚀 Service Cash on Delivery. Vous payez en espèces à Bamako après vérification de votre colis.
+                <p class="text-[11px] text-gray-400 leading-relaxed bg-blue-950/40 p-3 rounded-xl border border-blue-900/40 mt-6">
+                    🚀 Service Cash on Delivery. Vous payez en espèces à Bamako après vérification et satisfaction complète de votre colis.
                 </p>
             </div>
 
@@ -108,8 +165,32 @@
         </div>
     </main>
 
-    <footer class="mt-24 border-t border-blue-950/60 py-8 text-center text-xs text-gray-500 cosmic-font tracking-widest">
-        &copy; 2026 DOUMDELI BUSINESS. SYSTEM ACTIVATED.
+    <section class="container mx-auto mt-24 px-4 max-w-3xl">
+        <div class="text-center mb-10">
+            <span class="cosmic-font text-[10px] tracking-[0.3em] text-cyan-400 font-bold block mb-2">ASSISTANCE DIRECTE</span>
+            <h3 class="cosmic-font text-xl md:text-2xl font-black tracking-wider">QUESTIONS FRÉQUENTES (F.A.Q)</h3>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
+                <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Comment passer une commande sur Doumdeli ?</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Il vous suffit d'ajouter vos produits préférés au panier, de remplir vos coordonnées dans le formulaire de livraison, puis de cliquer sur "Confirmer la commande". Vous serez automatiquement redirigé vers notre WhatsApp pour finaliser l'expédition.</p>
+            </div>
+            
+            <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
+                <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Quels sont les délais de livraison à Bamako ?</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Toutes les commandes passées avant midi sont livrées le jour même. Les commandes passées en soirée sont livrées dès le lendemain matin à votre domicile ou bureau.</p>
+            </div>
+            
+            <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
+                <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Est-ce que je peux vérifier le produit avant de payer ?</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Oui, absolument ! C'est le principe du Cash on Delivery (COD). Le livreur vous remet le colis, vous l'ouvrez, vous vérifiez sa conformité et sa qualité, et vous payez ensuite en espèces.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="mt-28 border-t border-blue-950/60 py-8 text-center text-xs text-gray-500 cosmic-font tracking-widest">
+        &copy; 2026 DOUMDELI BUSINESS. SYSTEM ACTIVATED. ALL DIMENSIONS SECURED.
     </footer>
 
     <script src="app.js"></script>
