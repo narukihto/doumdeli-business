@@ -3,20 +3,20 @@
 // ==========================================
 const CACHE_NAME = 'doumdeli-space-v3';
 
-// المصفوفة الكبرى لتخزين كافة الأصول والـ 17 صورة الفيزيائية الجديدة لضمان العمل Offline
+// المصفوفة الكبرى لتخزين كافة الأصول والـ 29 صورة الفيزيائية لضمان العمل Offline
 const STATIC_ASSETS = [
   './',
   './index.html',
   './app.js',
   './manifest.json',
-  
+
   // --- IMAGES : ESPACE BÉBÉ ---
   './images/bebe1.jpg',
   './images/bebe2.jpg',
   './images/bebe3.jpg',
   './images/bebe4.jpg',
   './images/bebe5.jpg',
-  
+
   // --- IMAGES : ÉLECTRONIQUE ---
   './images/Balance scooter 1 .jpg',
   './images/electro1.jpg',
@@ -24,7 +24,7 @@ const STATIC_ASSETS = [
   './images/electro3.jpg',
   './images/electro4.jpg',
   './images/electro5.jpg',
-  
+
   // --- IMAGES : MATÉRIAUX DE CONSTRUCTION ---
   './images/Materiaux de construction1.jpg',
   './images/Materiaux de construction2.jpg',
@@ -33,7 +33,7 @@ const STATIC_ASSETS = [
   './images/Materiaux de construction5.jpg',
   './images/Materiaux de construction6.jpg',
   './images/Materiaux de construction7.jpg',
-  
+
   // --- IMAGES : MERCERIE & COUTURE ---
   './images/Mercerie1.jpg',
   './images/Mercerie2.jpg',
@@ -42,7 +42,7 @@ const STATIC_ASSETS = [
   './images/Mercerie5.jpg',
   './images/Mercerie6.jpg',
   './images/Mercerie7.jpg',
-  
+
   // --- IMAGES : PIÈCES DÉTACHÉES ---
   './images/Pièces détachées1.jpg',
   './images/Pièces détachées4.jpg',
@@ -121,10 +121,11 @@ self.addEventListener('fetch', (e) => {
           if (cachedResponse) {
             return cachedResponse;
           }
-          
-          // إذا كان الطلب المفقود عبارة عن صورة غير مخزنة، نعيد صورة احتياطية كوزمية تلقائياً
+
+          // إذا كان الطلب المفقود عبارة عن صورة غير مخزنة، نعيد الصورة الاحتياطية التلقائية من الكاش
           if (e.request.destination === 'image') {
-            return caches.match('https://images.unsplash.com/photo-1544816155-12df9643f363?w=500');
+            return caches.match('https://images.unsplash.com/photo-1544816155-12df9643f363?w=500')
+              .then(fallbackResponse => fallbackResponse || new Response('', { status: 404, statusText: 'Not Found' }));
           }
         });
       })
