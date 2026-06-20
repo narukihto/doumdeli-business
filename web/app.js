@@ -9,7 +9,7 @@ const WHATSAPP_NUMBER = "22379178766";
 
 let totalAmount = 0;
 let itemsCount = 0;
-let selectedProducts = []; // Conservé pour la compatibilité avec ton historique
+let selectedProducts = []; 
 let ALL_PRODUCTS_STORE = []; 
 let currentCategory = 'TOUT';
 
@@ -24,7 +24,7 @@ const LOCAL_PRODUCTS = [
     { title: "Pack Couches Bébé - Format Économique Pro", price: 18500, description: "Grand format économique qui offre une protection douce, fiable et durable pour toutes les mamans soucieuses du budget.", image: "./images/bebe3.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Format Familial Max", price: 22000, description: "La protection maximale pour les familles. Absorption renforcée jour et nuit avec indicateur d'humidité intégré.", image: "./images/bebe4.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Plus Ultra Premium", price: 25000, description: "Couches de nouvelle génération ultra-douces à base de coton organique pour les peaux extrêmement sensibles des nouveau-nés.", image: "./images/bebe5.jpg", category: "BÉBÉ" },
-    
+
     // --- ÉLECTRONIQUE (⚡) ---
     { title: "Smart Balance Scooter Pro Dynamic", price: 175000, description: "Scooter électrique intelligent de pointe avec gyroscope stabilisateur, lumières LED futuristes et batterie haute autonomie.", image: "./images/Balance scooter 1 .jpg", category: "ÉLECTRONIQUE" },
     { title: "Appareil Électronique Intelligent - Alpha 1", price: 85000, description: "Dernière technologie intelligente avec des performances puissantes, un design moderne et une connectivité réseau optimisée.", image: "./images/electro1.jpg", category: "ÉLECTRONIQUE" },
@@ -36,7 +36,7 @@ const LOCAL_PRODUCTS = [
     // --- MATÉRIAUX DE CONSTRUCTION (🧱) ---
     { title: "Matériaux de Construction - Ciment Haute Résistance v1", price: 6500, description: "Sac de ciment de qualité supérieure, idéal pour les fondations lourdes, les dalles et les structures porteuses de chantiers.", image: "./images/Materiaux de construction1.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Lot d'Acier Renforcé v2", price: 48000, description: "Barres de fer et d'acier de construction haute performance, résistantes à la torsion pour armatures de béton.", image: "./images/Materiaux de construction2.jpg", category: "MATÉRIAUX" },
-    { title: "Matériaux de Construction - Briques Finies Premium v3", price: 35000, description: "Lot de briques de construction haut de gamme, calibrées avec précision pour une isolation thermique et une solidité maximale.", image: "./images/Materiaux de construction3.jpg", category: "MATÉRIAUX" },
+    { title: "Matériaux de Construction - Briques Finies Premium v3", price: 35000, description: "Lot de briques de construction haut de gamme, calibrées avec précision pour une isolation thermique et une solidité maxima.", image: "./images/Materiaux de construction3.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Revêtement Extérieur Protect v4", price: 22500, description: "Enduit et mortier spécial pour façades extérieures offrant une protection étanche contre les intempéries et la chaleur.", image: "./images/Materiaux de construction4.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Peinture Isolante Spéciale v5", price: 32000, description: "Seau de peinture professionnelle longue durée, anti-fissures et lavable pour intérieurs et extérieurs modernes.", image: "./images/Materiaux de construction5.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Kit de Fixation Fondations v6", price: 15000, description: "Ensemble complet de visserie, ancrages et fixations industrielles pour gros œuvres et menuiseries lourdes.", image: "./images/Materiaux de construction6.jpg", category: "MATÉRIAUX" },
@@ -84,7 +84,7 @@ async function loadStoreData() {
         apiProducts.forEach(product => {
             let cat = "AUTRES"; 
             const apiCat = product.category.toLowerCase();
-            
+
             if (apiCat.includes('electronics')) {
                 cat = "ÉLECTRONIQUE";
             }
@@ -130,10 +130,10 @@ function renderProducts() {
     filtered.forEach(product => {
         const formattedPrice = new Intl.NumberFormat('fr-FR').format(product.price);
         const safeTitle = product.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        
+
         const card = document.createElement('div');
         card.className = "group bg-slate-900/40 backdrop-blur-md rounded-2xl p-4 border border-blue-500/5 hover:border-cyan-500/30 transition-all duration-300 flex flex-col justify-between hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] hover:scale-[1.01]";
-        
+
         card.innerHTML = `
             <div>
                 <div class="h-52 rounded-xl mb-4 bg-white flex items-center justify-center relative overflow-hidden p-3 shadow-inner">
@@ -178,7 +178,8 @@ function filterCategory(categoryName) {
     });
 
     renderProducts();
-    document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
+    const catalogSection = document.getElementById('catalog-section');
+    if (catalogSection) catalogSection.scrollIntoView({ behavior: 'smooth' });
 }
 
 // ==========================================
@@ -210,13 +211,12 @@ function removeProductEntirely(productName) {
     }
 }
 
-// دالة سحرية تقوم بتحديث الحسابات وعرض المنتجات مع أزرار الحذف بدون كسر الكود القديم
+// دالة الحسابات المربوطة بالكامل وبأمان مع معرّفات الـ HTML الخاصة بكِ
 function syncAndRenderCart() {
     totalAmount = 0;
     itemsCount = 0;
     selectedProducts = [];
 
-    // إعادة حساب القيم الكلية بناءً على التعديلات الحالية
     Object.keys(modernCart).forEach(name => {
         const item = modernCart[name];
         totalAmount += (item.price * item.quantity);
@@ -226,30 +226,27 @@ function syncAndRenderCart() {
         }
     });
 
-    // تحديث الأرقام الأساسية في الهيدر والفاتورة
     if(document.getElementById('cart-count')) document.getElementById('cart-count').innerText = itemsCount;
     if(document.getElementById('total-price')) document.getElementById('total-price').innerText = totalAmount.toLocaleString('fr-FR') + " FCFA";
 
-    // تحديث منطقة النص القديمة لضمان الأمان وعدم حدوث Fatal Error
-    const legacyDisplay = document.getElementById('selected-items-list');
-    
-    if (legacyDisplay) {
-        // حيلة برمجية ذكية: إذا كان العنصر عبارة عن نص عادي، سنحوله إلى حاوية تفاعلية جميلة بها أزرار حذف
-        legacyDisplay.innerHTML = '';
-        legacyDisplay.className = "space-y-2 block text-left mt-2"; // تحويله لتصميم متناسق تلقائياً
+    // الربط الصحيح والمباشر مع الـ Container الخاص بملفكِ الـ HTML
+    const cartContainer = document.getElementById('cart-items-container');
+
+    if (cartContainer) {
+        cartContainer.innerHTML = '';
 
         const items = Object.keys(modernCart);
         if (items.length === 0) {
-            legacyDisplay.innerText = "Aucun produit sélectionné.";
+            cartContainer.innerHTML = `<p id="empty-cart-message" class="text-gray-500 italic py-4">Aucun produit dans le panier. Explorez le catalogue pour ajouter des articles.</p>`;
             return;
         }
 
         items.forEach(name => {
             const item = modernCart[name];
             const safeName = name.replace(/'/g, "\\'");
-            
+
             const row = document.createElement('div');
-            row.className = "flex items-center justify-between bg-slate-950/60 p-2 rounded-xl border border-white/5 text-xs text-gray-200";
+            row.className = "flex items-center justify-between bg-slate-950/60 p-2 rounded-xl border border-white/5 text-xs text-gray-200 mt-2";
             row.innerHTML = `
                 <span class="truncate pr-2 font-semibold flex-1">${name} (x${item.quantity})</span>
                 <div class="flex items-center space-x-1 flex-shrink-0">
@@ -258,7 +255,7 @@ function syncAndRenderCart() {
                     <button onclick="removeProductEntirely('${safeName}')" class="w-5 h-5 bg-red-950/50 text-red-400 rounded flex items-center justify-center hover:bg-red-900 hover:text-white text-[10px]" title="Supprimer">🗑️</button>
                 </div>
             `;
-            legacyDisplay.appendChild(row);
+            cartContainer.appendChild(row);
         });
     }
 }
@@ -268,7 +265,7 @@ function syncAndRenderCart() {
 // ==========================================
 function submitCosmicOrder(event) {
     event.preventDefault();
-    
+
     if (totalAmount === 0 || selectedProducts.length === 0) {
         alert("⚠️ Votre panier est vide. Veuillez sélectionner des articles du catalogue interdimensionnel avant de commander.");
         return;
@@ -284,15 +281,15 @@ function submitCosmicOrder(event) {
     messageTxt += `▪️ *Nom Complet :* ${nomClient}\n`;
     messageTxt += `▪️ *Téléphone WhatsApp :* ${telephoneClient}\n`;
     messageTxt += `▪️ *Adresse & Quartier (Bamako) :* ${adresseClient}\n\n`;
-    
+
     messageTxt += `📦 *BORDEREAU DES ARTICLES COMMANDÉS :*\n`;
     messageTxt += `----------------------------------------------------------\n`;
-    
+
     Object.keys(modernCart).forEach(name => {
         const item = modernCart[name];
         messageTxt += `🔹 _${name}_ \n    *Quantité :* x${item.quantity}\n    *Prix :* ${(item.price * item.quantity).toLocaleString('fr-FR')} FCFA\n`;
     });
-    
+
     messageTxt += `----------------------------------------------------------\n\n`;
     messageTxt += `💰 *MONTANT TOTAL À PAYER (COD) :* ${totalAmount.toLocaleString('fr-FR')} FCFA\n\n`;
     messageTxt += `🚀 *LOGISTIQUE :* Expédition validée. Paiement de main à main après vérification complète du colis auprès du livreur.\n\n`;
