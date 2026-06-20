@@ -2,27 +2,33 @@
 // 1. CONFIGURATION ET HUBS DE STOCK COUSMIQUE
 // ==========================================
 const API_URL = 'https://fakestoreapi.com/products';
-const EXCHANGE_RATE = 610;
+const EXCHANGE_RATE = 610; // معدل تحويل الأسعار من الدولار إلى FCFA
 
+// رقم الواتساب الخاص بمتجرك الحقيقي بعد التحديث والربط المباشر
 const WHATSAPP_NUMBER = "22379178766"; 
 
+let totalAmount = 0;
+let itemsCount = 0;
+let selectedProducts = []; // Conservé pour la compatibilité avec ton historique
 let ALL_PRODUCTS_STORE = []; 
-let cart = {}; // هيكل بيانات السلة المطور لحفظ المنتجات بشكل كائن تفاعلي [productTitle]: {price, quantity}
 let currentCategory = 'TOUT';
 
-// مخزون المنتجات الحقيقية
+// نظام كائن السلة الجديد لإدارة الكميات والحذف بسهولة بدون أخطاء
+let modernCart = {};
+
+// مخزون المنتجات المحلية الضخم والممتد بناءً على ملفات صورك الحقيقية بالملي
 const LOCAL_PRODUCTS = [
     // --- ESPACE BÉBÉ (👶) ---
     { title: "Pack Couches Bébé - Édition Confort 1", price: 12500, description: "Couches pour bébé de haute qualité, douces pour la peau, hypoallergéniques et ultra absorbantes pour des nuits paisibles.", image: "./images/bebe1.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Édition Protection 2", price: 14000, description: "Pack de couches premium anti-fuites avec barrières latérales extensibles, parfaitement adaptées aux mouvements de l'enfant.", image: "./images/bebe2.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Format Économique Pro", price: 18500, description: "Grand format économique qui offre une protection douce, fiable et durable pour toutes les mamans soucieuses du budget.", image: "./images/bebe3.jpg", category: "BÉBÉ" },
-    { title: "Pack Couches Bébé - Format Familial Max", price: 22000, description: "La protection maximale pour les familles. Absorption reinforced jour et nuit avec indicateur d'humidité intégré.", image: "./images/bebe4.jpg", category: "BÉBÉ" },
+    { title: "Pack Couches Bébé - Format Familial Max", price: 22000, description: "La protection maximale pour les familles. Absorption renforcée jour et nuit avec indicateur d'humidité intégré.", image: "./images/bebe4.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Plus Ultra Premium", price: 25000, description: "Couches de nouvelle génération ultra-douces à base de coton organique pour les peaux extrêmement sensibles des nouveau-nés.", image: "./images/bebe5.jpg", category: "BÉBÉ" },
     
     // --- ÉLECTRONIQUE (⚡) ---
     { title: "Smart Balance Scooter Pro Dynamic", price: 175000, description: "Scooter électrique intelligent de pointe avec gyroscope stabilisateur, lumières LED futuristes et batterie haute autonomie.", image: "./images/Balance scooter 1 .jpg", category: "ÉLECTRONIQUE" },
     { title: "Appareil Électronique Intelligent - Alpha 1", price: 85000, description: "Dernière technologie intelligente avec des performances puissantes, un design moderne et une connectivité réseau optimisée.", image: "./images/electro1.jpg", category: "ÉLECTRONIQUE" },
-    { title: "Système Électronique Avancé - Quantum 3", price: 120000, description: "Outil technologique de pointe offrant une grande efficacité énergétique et des fonctionnalités automatisées avancées.", image: "./images/electro2.jpg", category: "ÉLECTRONIQUE" },
+    { title: "Système Électronique Avancé - Quantum 3", price: 120000, description: "Outil technologique de pointe offering une grande efficacité énergétique et des fonctionnalités automatisées avancées.", image: "./images/electro2.jpg", category: "ÉLECTRONIQUE" },
     { title: "Édition de Luxe - Tech Pro 5 Turbo", price: 165000, description: "Version premium de luxe combinant puissance brute, processeur accéléré et fonctionnalités de nouvelle génération.", image: "./images/electro3.jpg", category: "ÉLECTRONIQUE" },
     { title: "Module Connecté - NextGen v4 Smart", price: 95000, description: "Composant et appareil de haute précision pour optimiser vos installations domestiques et professionnelles intelligentes.", image: "./images/electro4.jpg", category: "ÉLECTRONIQUE" },
     { title: "Station Centrale Électronique - Max Power", price: 145000, description: "Console d'alimentation et de contrôle centralisée avec fusibles de protection intégrés contre les surtensions et coupures.", image: "./images/electro5.jpg", category: "ÉLECTRONIQUE" },
@@ -92,14 +98,14 @@ async function loadStoreData() {
             });
         });
     } catch (error) {
-        console.log("Mode Local Activé. Les محصولات الحقيقية جاهزة.");
+        console.log("Mode Local Activé avec succès. Les 17 produits physiques sont prioritaires.");
     }
 
     renderProducts();
 }
 
 // ==========================================
-// 3. GENERATION DE LA GRILLE DES PRODUITS
+// 3. GENERATION DE LA GRILLE DES PRODUITS ET DESIGN CASIER
 // ==========================================
 function renderProducts() {
     const productsGrid = document.getElementById('products-grid');
@@ -123,7 +129,6 @@ function renderProducts() {
 
     filtered.forEach(product => {
         const formattedPrice = new Intl.NumberFormat('fr-FR').format(product.price);
-        // معالجة علامات الاقتباس لتفادي مشاكل الأكواد
         const safeTitle = product.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         
         const card = document.createElement('div');
@@ -155,7 +160,7 @@ function renderProducts() {
 }
 
 // ==========================================
-// 4. CONTROL DES BOUTONS DE FILTRES
+// 4. CONTROL ET DESIGN ACTIONNELS DES BOUTONS DE FILTRES
 // ==========================================
 function filterCategory(categoryName) {
     currentCategory = categoryName;
@@ -177,90 +182,85 @@ function filterCategory(categoryName) {
 }
 
 // ==========================================
-// 5. ENGINE DE GESTION DU PANIER (إضافة، تعديل، وحذف كامل)
+// 5. GESTION DU PANIER INTERACTIF (AJOUT / QUANTITÉ / SUPPRESSION)
 // ==========================================
-
-// أ: دالة الإضافة الأساسية للسلة
 function addToCart(productName, price) {
-    if (cart[productName]) {
-        cart[productName].quantity += 1;
+    if (modernCart[productName]) {
+        modernCart[productName].quantity += 1;
     } else {
-        cart[productName] = { price: price, quantity: 1 };
+        modernCart[productName] = { price: price, quantity: 1 };
     }
-    updateCartUI();
+    syncAndRenderCart();
 }
 
-// ب: دالة تقليل كمية المنتج بـ 1 زر (-)
-function decreaseQuantity(productName) {
-    if (cart[productName]) {
-        cart[productName].quantity -= 1;
-        if (cart[productName].quantity <= 0) {
-            delete cart[productName]; // حذف تلقائي إذا وصلت الكمية لصفر
+function updateQuantity(productName, amount) {
+    if (modernCart[productName]) {
+        modernCart[productName].quantity += amount;
+        if (modernCart[productName].quantity <= 0) {
+            delete modernCart[productName];
         }
+        syncAndRenderCart();
     }
-    updateCartUI();
 }
 
-// ج: دالة الحذف الكلي والنهائي للمنتج زر (🗑️)
-function removeFromCart(productName) {
-    if (cart[productName]) {
-        delete cart[productName];
+function removeProductEntirely(productName) {
+    if (modernCart[productName]) {
+        delete modernCart[productName];
+        syncAndRenderCart();
     }
-    updateCartUI();
 }
 
-// د: تحديث وعرض واجهة السلة والفاتورة التفاعلية بالكامل
-function updateCartUI() {
-    const itemsContainer = document.getElementById('cart-items-container');
-    const cartCountEl = document.getElementById('cart-count');
-    const totalPriceEl = document.getElementById('total-price');
+// دالة سحرية تقوم بتحديث الحسابات وعرض المنتجات مع أزرار الحذف بدون كسر الكود القديم
+function syncAndRenderCart() {
+    totalAmount = 0;
+    itemsCount = 0;
+    selectedProducts = [];
 
-    if (!itemsContainer) return;
-
-    itemsContainer.innerHTML = '';
-    let totalAmount = 0;
-    let totalItems = 0;
-
-    const productsInCart = Object.keys(cart);
-
-    if (productsInCart.length === 0) {
-        itemsContainer.innerHTML = `<p id="empty-cart-message" class="text-gray-500 italic py-4">Aucun produit dans le panier. Explorez le catalogue pour ajouter des articles.</p>`;
-        cartCountEl.innerText = 0;
-        totalPriceEl.innerText = "0 FCFA";
-        return;
-    }
-
-    // بناء الأسطر التفاعلية للمنتجات داخل الفاتورة
-    productsInCart.forEach(name => {
-        const item = cart[name];
-        const itemTotal = item.price * item.quantity;
-        totalAmount += itemTotal;
-        totalItems += item.quantity;
-
-        const row = document.createElement('div');
-        row.className = "flex items-center justify-between bg-slate-950/50 p-2.5 rounded-xl border border-white/5 gap-2 transition hover:border-blue-900/40";
-        
-        // تجهيز الاسم البرمجي الآمن لتمريره في الأزرار
-        const safeName = name.replace(/'/g, "\\'");
-
-        row.innerHTML = `
-            <div class="flex-1 min-w-0">
-                <h4 class="text-slate-200 font-semibold truncate text-[11px]" title="${name}">${name}</h4>
-                <p class="text-[10px] text-cyan-400 font-mono">${item.price.toLocaleString('fr-FR')} x ${item.quantity} = ${itemTotal.toLocaleString('fr-FR')} FCFA</p>
-            </div>
-            <div class="flex items-center space-x-1.5 flex-shrink-0">
-                <button onclick="decreaseQuantity('${safeName}')" class="w-5 h-5 bg-slate-900 text-gray-400 rounded-md flex items-center justify-center font-bold hover:bg-slate-800 hover:text-white transition text-xs">-</button>
-                <span class="text-xs font-bold font-mono px-1 text-slate-300">${item.quantity}</span>
-                <button onclick="addToCart('${safeName}', ${item.price})" class="w-5 h-5 bg-slate-900 text-gray-400 rounded-md flex items-center justify-center font-bold hover:bg-slate-800 hover:text-white transition text-xs">+</button>
-                <button onclick="removeFromCart('${safeName}')" class="w-5 h-5 bg-red-950/40 text-red-400 rounded-md flex items-center justify-center hover:bg-red-900 hover:text-white transition text-[10px]" title="Supprimer">🗑️</button>
-            </div>
-        `;
-        itemsContainer.appendChild(row);
+    // إعادة حساب القيم الكلية بناءً على التعديلات الحالية
+    Object.keys(modernCart).forEach(name => {
+        const item = modernCart[name];
+        totalAmount += (item.price * item.quantity);
+        itemsCount += item.quantity;
+        for (let i = 0; i < item.quantity; i++) {
+            selectedProducts.push(name);
+        }
     });
 
-    // تحديث الأرقام الكلية للعداد والفاتورة
-    cartCountEl.innerText = totalItems;
-    totalPriceEl.innerText = totalAmount.toLocaleString('fr-FR') + " FCFA";
+    // تحديث الأرقام الأساسية في الهيدر والفاتورة
+    if(document.getElementById('cart-count')) document.getElementById('cart-count').innerText = itemsCount;
+    if(document.getElementById('total-price')) document.getElementById('total-price').innerText = totalAmount.toLocaleString('fr-FR') + " FCFA";
+
+    // تحديث منطقة النص القديمة لضمان الأمان وعدم حدوث Fatal Error
+    const legacyDisplay = document.getElementById('selected-items-list');
+    
+    if (legacyDisplay) {
+        // حيلة برمجية ذكية: إذا كان العنصر عبارة عن نص عادي، سنحوله إلى حاوية تفاعلية جميلة بها أزرار حذف
+        legacyDisplay.innerHTML = '';
+        legacyDisplay.className = "space-y-2 block text-left mt-2"; // تحويله لتصميم متناسق تلقائياً
+
+        const items = Object.keys(modernCart);
+        if (items.length === 0) {
+            legacyDisplay.innerText = "Aucun produit sélectionné.";
+            return;
+        }
+
+        items.forEach(name => {
+            const item = modernCart[name];
+            const safeName = name.replace(/'/g, "\\'");
+            
+            const row = document.createElement('div');
+            row.className = "flex items-center justify-between bg-slate-950/60 p-2 rounded-xl border border-white/5 text-xs text-gray-200";
+            row.innerHTML = `
+                <span class="truncate pr-2 font-semibold flex-1">${name} (x${item.quantity})</span>
+                <div class="flex items-center space-x-1 flex-shrink-0">
+                    <button onclick="updateQuantity('${safeName}', -1)" class="w-5 h-5 bg-slate-800 rounded flex items-center justify-center text-gray-400 hover:text-white font-bold text-xs">-</button>
+                    <button onclick="addToCart('${safeName}', ${item.price})" class="w-5 h-5 bg-slate-800 rounded flex items-center justify-center text-gray-400 hover:text-white font-bold text-xs">+</button>
+                    <button onclick="removeProductEntirely('${safeName}')" class="w-5 h-5 bg-red-950/50 text-red-400 rounded flex items-center justify-center hover:bg-red-900 hover:text-white text-[10px]" title="Supprimer">🗑️</button>
+                </div>
+            `;
+            legacyDisplay.appendChild(row);
+        });
+    }
 }
 
 // ==========================================
@@ -269,9 +269,7 @@ function updateCartUI() {
 function submitCosmicOrder(event) {
     event.preventDefault();
     
-    const productsInCart = Object.keys(cart);
-    
-    if (productsInCart.length === 0) {
+    if (totalAmount === 0 || selectedProducts.length === 0) {
         alert("⚠️ Votre panier est vide. Veuillez sélectionner des articles du catalogue interdimensionnel avant de commander.");
         return;
     }
@@ -279,9 +277,6 @@ function submitCosmicOrder(event) {
     const nomClient = document.getElementById('customer-name').value.trim();
     const telephoneClient = document.getElementById('customer-phone').value.trim();
     const adresseClient = document.getElementById('customer-address').value.trim();
-
-    // حساب الإجمالي العام أثناء إعداد الرسالة
-    let calculatedTotal = 0;
 
     let messageTxt = `🌌 *NOUVELLE COMMANDE GLOBAL - DOUMDELI BUSINESS* 🌌\n`;
     messageTxt += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -293,20 +288,13 @@ function submitCosmicOrder(event) {
     messageTxt += `📦 *BORDEREAU DES ARTICLES COMMANDÉS :*\n`;
     messageTxt += `----------------------------------------------------------\n`;
     
-    // بناء الأسطر في رسالة الواتساب بالكميات والأسعار الفرعية
-    productsInCart.forEach(name => {
-        const item = cart[name];
-        const subTotal = item.price * item.quantity;
-        calculatedTotal += subTotal;
-        
-        messageTxt += `🔹 _${name}_ \n`;
-        messageTxt += `    *Quantité :* x${item.quantity} \n`;
-        messageTxt += `    *Prix :* ${subTotal.toLocaleString('fr-FR')} FCFA\n`;
-        messageTxt += `    --------------------------------------\n`;
+    Object.keys(modernCart).forEach(name => {
+        const item = modernCart[name];
+        messageTxt += `🔹 _${name}_ \n    *Quantité :* x${item.quantity}\n    *Prix :* ${(item.price * item.quantity).toLocaleString('fr-FR')} FCFA\n`;
     });
     
     messageTxt += `----------------------------------------------------------\n\n`;
-    messageTxt += `💰 *MONTANT TOTAL À PAYER (COD) :* ${calculatedTotal.toLocaleString('fr-FR')} FCFA\n\n`;
+    messageTxt += `💰 *MONTANT TOTAL À PAYER (COD) :* ${totalAmount.toLocaleString('fr-FR')} FCFA\n\n`;
     messageTxt += `🚀 *LOGISTIQUE :* Expédition validée. Paiement de main à main après vérification complète du colis auprès du livreur.\n\n`;
     messageTxt += `🛸 _Système automatisé Doumdeli Core v4.0 - Bamako, Mali._`;
 
@@ -321,7 +309,7 @@ function submitCosmicOrder(event) {
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker Global Doumdeli Connecté.'))
+            .then(reg => console.log('Service Worker Global Doumdeli Connecté avec succès !'))
             .catch(err => console.log('SW Registration Error', err));
     });
 }
