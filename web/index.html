@@ -38,7 +38,7 @@
         <div class="relative glass-card rounded-3xl p-8 md:p-12 overflow-hidden shadow-[0_0_50px_rgba(30,58,138,0.3)] border border-blue-500/20 bg-gradient-to-br from-indigo-950/40 via-purple-950/10 to-black/50 text-center">
             <div class="absolute -top-24 -left-24 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none"></div>
-            
+
             <span class="cosmic-font text-xs uppercase tracking-[0.4em] text-cyan-400 font-bold block mb-3">L'avenir du Commerce à Bamako</span>
             <h2 class="cosmic-font text-4xl md:text-6xl font-black mb-4 tracking-tight bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent">
                 Explorez la Dimension Doumdeli
@@ -53,9 +53,10 @@
         <h3 class="cosmic-font text-lg font-bold mb-8 text-cyan-400 tracking-wider flex items-center space-x-2">
             <span>✨</span> <span>CATALOGUE DES PRODUITS ULTRA-TENDANCE (FCFA)</span>
         </h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-container">
-            
+
+        <!-- تم تحديث المعرف هنا إلى products-grid ليتوافق مع سكربت الجلب التلقائي -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
+
             <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
                 <div>
                     <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
@@ -194,7 +195,7 @@
         </div>
 
         <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            
+
             <div class="glass-card p-6 rounded-3xl border border-cyan-500/20 bg-gradient-to-b from-blue-950/30 to-black/80 shadow-xl flex flex-col justify-between">
                 <div>
                     <h3 class="cosmic-font text-sm font-bold mb-4 text-cyan-400 tracking-widest uppercase">1. VOTRE COMMANDE (COD)</h3>
@@ -211,44 +212,28 @@
                 <h3 class="cosmic-font text-sm font-bold mb-4 text-blue-400 tracking-widest uppercase">2. INFORMATION DE LIVRAISON</h3>
                 <form id="orderForm" onsubmit="submitCosmicOrder(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1 font-semibold">Nom Complet *</label>
-                        <input type="text" id="client-name" required class="w-full bg-blue-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition" placeholder="Ex: Amadou Diallo">
+                        <label class="block text-xs text-gray-400 mb-1">Nom Complet</label>
+                        <input type="text" id="customer-name" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition text-white" placeholder="Ex: Amadou Diallo">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1 font-semibold">Numéro de Téléphone *</label>
-                        <input type="tel" id="client-phone" required class="w-full bg-blue-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition" placeholder="Ex: +223 70 00 00 00">
+                        <label class="block text-xs text-gray-400 mb-1">Téléphone WhatsApp</label>
+                        <input type="tel" id="customer-phone" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition text-white" placeholder="Ex: +223 70 00 00 00">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1 font-semibold">Quartier à Bamako *</label>
-                        <input type="text" id="client-address" required class="w-full bg-blue-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition" placeholder="Ex: Badalabougou, Rue 12">
+                        <label class="block text-xs text-gray-400 mb-1">Quartier à Bamako</label>
+                        <input type="text" id="customer-address" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition text-white" placeholder="Ex: Baco-Djicoroni ACI">
                     </div>
-                    <button type="submit" class="w-full mt-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl text-xs tracking-widest uppercase cosmic-font transition shadow-lg">
-                        Confirmer Ma Commande ✨
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-500 via-indigo-600 to-cyan-500 hover:opacity-90 text-white font-bold py-3 px-4 rounded-xl text-xs tracking-widest uppercase cosmic-font transition-all shadow-lg shadow-indigo-500/20 mt-2">
+                        Confirmer via WhatsApp 🛸
                     </button>
                 </form>
-            </div>
-
-            <div id="waiting-status-container" class="hidden glass-card p-6 rounded-3xl border border-yellow-500/30 bg-gradient-to-b from-slate-950 to-black shadow-2xl text-center md:col-span-2 max-w-xl mx-auto w-full">
-                <div class="inline-block animate-spin text-3xl mb-3 text-yellow-400">🌀</div>
-                <h3 class="cosmic-font text-base font-bold text-yellow-400 tracking-wider uppercase mb-2">Traitement Cosmique En Cours</h3>
-                <p class="text-xs text-gray-300 mb-4">Merci <span id="status-client-name" class="text-cyan-400 font-bold"></span>, votre demande a été enregistrée avec succès sous le numéro <span class="text-purple-400 font-mono font-bold">#DB-2026-X</span>.</p>
-                
-                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-4">
-                    <div class="bg-gradient-to-r from-yellow-500 via-orange-500 to-green-500 h-full w-1/3 animate-pulse"></div>
-                </div>
-                
-                <div class="grid grid-cols-3 text-[10px] cosmic-font text-gray-500 gap-1 font-bold">
-                    <div class="text-yellow-400">1. Reçu 📥</div>
-                    <div>2. En Préparation 📦</div>
-                    <div>3. En Livraison 🚚</div>
-                </div>
             </div>
 
         </div>
     </main>
 
-    <footer class="text-center py-8 text-xs text-gray-600 cosmic-font border-t border-white/5 mt-12">
-        &copy; 2026 DOUMDELI BUSINESS. ALL RIGHTS RESERVED. MALIAN MARKET DIMENSION.
+    <footer class="mt-24 border-t border-blue-950/60 py-8 text-center text-xs text-gray-500 cosmic-font tracking-widest">
+        &copy; 2026 DOUMDELI BUSINESS. SYSTEM ACTIVATED.
     </footer>
 
     <script src="app.js"></script>
