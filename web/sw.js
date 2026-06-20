@@ -1,24 +1,23 @@
-const CACHE_NAME = 'doumdeli-space-v2';
+const CACHE_NAME = 'doumdeli-space-v3';
 
-// Liste des fichiers et images locaux à mettre en cache dès l'installation
-// Les chemins sont relatifs au dossier où se trouve index.html et app.js (généralement dans le dossier web)
 const STATIC_ASSETS = [
   './',
   './index.html',
   './app.js',
   './manifest.json',
-  './images/1 حزمة حفاضات أطفال .jpg',
-  './images/2 حزمة حفاضات أطفال .jpg',
-  './images/3 حزمة حفاضات أطفال .jpg',
-  './images/4 حزمة حفاضات أطفال .jpg',
-  './images/5 حزمة حفاضات أطفال .jpg',
-  './images/1 اجهزه.jpg',
-  './images/3 اجهزه.jpg',
-  './images/5 اجهز.jpg',
-  './images/IMG-20260618-WA0056.jpg'
+  './images/Balance scooter 1 .jpg',
+  './images/bebe1.jpg',
+  './images/bebe2.jpg',
+  './images/bebe3.jpg',
+  './images/bebe4.jpg',
+  './images/bebe5.jpg',
+  './images/electro1.jpg',
+  './images/electro2.jpg',
+  './images/electro3.jpg',
+  './images/electro4.jpg',
+  './images/electro5.jpg'
 ];
 
-// 1. Installation du Service Worker et mise en cache des ressources
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -27,7 +26,6 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// 2. Activation et nettoyage automatique des anciens caches
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
@@ -42,7 +40,6 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// 3. Stratégie de Network First : Priorité au réseau avec sauvegarde pour le mode hors-ligne
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
