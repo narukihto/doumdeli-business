@@ -1,40 +1,58 @@
-const CACHE_NAME = 'doumdeli-space-v2'; // تحديث الإصدار لضمان تنشيط التعديلات الجديدة
+const CACHE_NAME = 'doumdeli-space-v2';
+
+// Liste des fichiers et images locaux à mettre en cache dès l'installation
 const STATIC_ASSETS = [
   './',
   './index.html',
   './app.js',
-  './manifest.json'
+  './manifest.json',
+  './images/1 حزمة حفاضات أطفال .jpg',
+  './images/2 حزمة حفاضات أطفال .jpg',
+  './images/3 حزمة حفاضات أطفال .jpg',
+  './images/4 حزمة حفاضات أطفال .jpg',
+  './images/5 حزمة حفاضات أطفال .jpg',
+  './images/1 اجهزه.jpg',
+  './images/3 اجهزه.jpg',
+  './images/5 اجهز.jpg',
+  './images/IMG-20260618-WA0056.jpg'
 ];
 
-// 1. تثبيت التطبيق وتخزين الملفات الأساسية (كودك الأصلي)
+// 1. Installation du Service Worker et mise en cache des ressources stables
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS);
+    })
   );
 });
 
-// 2. تفعيل السيرفس وركر وتنظيف ملفات الكاش القديمة تلقائياً لعدم ملء ذاكرة الهاتف
+// 2. Activation et nettoyage automatique des anciens caches pour libérer l'espace
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
         })
       );
     })
   );
 });
 
-// 3. تشغيل التطبيق وجلب البيانات ديناميكياً وحفظ صور المستودع الموحد
+// 3. Stratégie de Network First : Priorité au réseau avec sauvegarde dynamique pour le mode hors-ligne
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
       .then((response) => {
-        // إذا كان الاتصال بالإنترنت ناجحاً والطلب قادم من رابط المنتجات الموحد أو يحتوي على صورة
-        if (response.status === 200 && (e.request.url.includes('fakestoreapi.com') || e.request.url.includes('image') || e.request.destination === 'image')) {
+        // Si la requête est réussie, on sauvegarde dynamiquement les images et l'API
+        if (response.status === 200 && (
+            e.request.url.includes('fakestoreapi.com') || 
+            e.request.url.includes('image') || 
+            e.request.destination === 'image'
+        )) {
           const responseClone = response.clone();
-          // قم بفتح الكاش وحفظ نسخة من الصور والبيانات لتعمل لاحقاً بدون إنترنت
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(e.request, responseClone);
           });
@@ -42,7 +60,7 @@ self.addEventListener('fetch', (e) => {
         return response;
       })
       .catch(() => {
-        // في حال انقطع الإنترنت تماماً في باماكو، قم بجلب النسخة المحفوظة محلياً بسلاسة
+        // Si internet coupe, on récupère directement les données depuis le cache local
         return caches.match(e.request);
       })
   );
