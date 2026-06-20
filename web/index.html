@@ -49,150 +49,26 @@
         </div>
     </section>
 
-    <main class="container mx-auto p-6 mt-6">
-        <h3 class="cosmic-font text-lg font-bold mb-8 text-cyan-400 tracking-wider flex items-center space-x-2">
-            <span>✨</span> <span>CATALOGUE DES PRODUITS ULTRA-TENDANCE (FCFA)</span>
-        </h3>
-
-        <!-- تم تحديث المعرف هنا إلى products-grid ليتوافق مع سكربت الجلب التلقائي -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">📱</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">PREMIUM</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Smartphone Nebula Alpha</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Écran AMOLED haute fluidité, processeur ultra-rapide et autonomie de 2 jours.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">150 000 FCFA</span>
-                    <button onclick="addToCart('Smartphone Nebula Alpha', 150000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">🎧</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">AUDIO</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Écouteurs Pulsar Sound</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Réduction active du bruit, son spatial 3D et embouts ergonomiques isolants.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">35 000 FCFA</span>
-                    <button onclick="addToCart('Écouteurs Pulsar Sound', 35000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">⌚</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">SMART</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Montre Chrono Orbit</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Suivi d'activité complet, capteur cardiaque et notifications d'appels en direct.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">65 000 FCFA</span>
-                    <button onclick="addToCart('Montre Chrono Orbit', 65000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">💻</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">WORK</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">PC Portable Quantum v4</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Ultra-fin, idéal pour le travail et les études. 16Go RAM, 512Go SSD de stockage.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">380 000 FCFA</span>
-                    <button onclick="addToCart('PC Portable Quantum v4', 380000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">🧪</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">LUXE</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Parfum Étoile Sombre</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Fragrance orientale boisée de longue durée. Parfum signature haut de gamme.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">45 000 FCFA</span>
-                    <button onclick="addToCart('Parfum Étoile Sombre', 45000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">👟</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">STYLE</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Baskets Meteor Run</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Confort absolu avec semelle amortissante. Look futuriste ultra moderne.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">28 000 FCFA</span>
-                    <button onclick="addToCart('Baskets Meteor Run', 28000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">🕶️</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">VIP</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Lunettes Lunaires Polarisées</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Protection UV400 maximale avec monture en alliage noir mat léger.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">15 000 FCFA</span>
-                    <button onclick="addToCart('Lunettes Lunaires', 15000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">🔌</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">POWER</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Station HyperCharge 65W</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Chargeur universel intelligent Gan à triple port. Charge ultra rapide sécurisée.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">18 000 FCFA</span>
-                    <button onclick="addToCart('Station HyperCharge', 18000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group border border-white/5 hover:border-cyan-500/30">
-                <div>
-                    <div class="h-44 rounded-xl mb-4 bg-gradient-to-tr from-blue-950 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden border border-blue-500/10">
-                        <span class="text-4xl group-hover:scale-110 transition duration-300">🧥</span>
-                        <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur px-2 py-0.5 rounded text-[10px] text-cyan-300 cosmic-font">FASHION</div>
-                    </div>
-                    <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition duration-200">Veste Cyberpunk Cosmic</h4>
-                    <p class="text-gray-400 text-xs mt-1 leading-relaxed">Tissu imperméable haut de gamme, coupe ajustée avec reflets discrets nocturnes.</p>
-                </div>
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/5">
-                    <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 cosmic-font">32 000 FCFA</span>
-                    <button onclick="addToCart('Veste Cyberpunk', 32000)" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-2 px-4 rounded-xl text-xs tracking-wider uppercase cosmic-font transition-all">Acheter</button>
-                </div>
-            </div>
-
+    <section class="container mx-auto mt-10 px-4 text-center">
+        <div class="inline-flex flex-wrap justify-center gap-3 p-2 rounded-2xl glass-card bg-slate-950/40 border border-white/5">
+            <button onclick="filterCategory('TOUT')" id="btn-tout" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg">
+                🚀 TOUT EXPLORER
+            </button>
+            <button onclick="filterCategory('BÉBÉ')" id="btn-bebe" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider text-gray-400 hover:text-white hover:bg-white/5">
+                👶 ESPACE BÉBÉ
+            </button>
+            <button onclick="filterCategory('ÉLECTRONIQUE')" id="btn-electronique" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider text-gray-400 hover:text-white hover:bg-white/5">
+                ⚡ ÉLECTRONIQUE
+            </button>
+            <button onclick="filterCategory('AUTRES')" id="btn-autres" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider text-gray-400 hover:text-white hover:bg-white/5">
+                ✨ AUTRES PRODUITS
+            </button>
         </div>
+    </section>
+
+    <main class="container mx-auto p-6 mt-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
+            </div>
 
         <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
 
@@ -224,7 +100,7 @@
                         <input type="text" id="customer-address" required class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition text-white" placeholder="Ex: Baco-Djicoroni ACI">
                     </div>
                     <button type="submit" class="w-full bg-gradient-to-r from-blue-500 via-indigo-600 to-cyan-500 hover:opacity-90 text-white font-bold py-3 px-4 rounded-xl text-xs tracking-widest uppercase cosmic-font transition-all shadow-lg shadow-indigo-500/20 mt-2">
-                        Confirmer via WhatsApp 🛸
+                        Confirmer la commande 🛸
                     </button>
                 </form>
             </div>
