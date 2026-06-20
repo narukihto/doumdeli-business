@@ -1,23 +1,24 @@
 const CACHE_NAME = 'doumdeli-space-v2';
 
 // Liste des fichiers et images locaux à mettre en cache dès l'installation
+// Les chemins sont relatifs au dossier où se trouve index.html et app.js (généralement dans le dossier web)
 const STATIC_ASSETS = [
   './',
   './index.html',
   './app.js',
   './manifest.json',
-  './images/1حزمة حفاضات أطفال .jpg',
-  './images/2حزمة حفاضات أطفال .jpg',
-  './images/3حزمة حفاضات أطفال .jpg',
-  './images/4حزمة حفاضات أطفال .jpg',
-  './images/5حزمة حفاضات أطفال .jpg',
-  './images/1اجهزه.jpg',
-  './images/3اجهزه.jpg',
-  './images/5اجهز.jpg',
+  './images/1 حزمة حفاضات أطفال .jpg',
+  './images/2 حزمة حفاضات أطفال .jpg',
+  './images/3 حزمة حفاضات أطفال .jpg',
+  './images/4 حزمة حفاضات أطفال .jpg',
+  './images/5 حزمة حفاضات أطفال .jpg',
+  './images/1 اجهزه.jpg',
+  './images/3 اجهزه.jpg',
+  './images/5 اجهز.jpg',
   './images/IMG-20260618-WA0056.jpg'
 ];
 
-// 1. Installation du Service Worker et mise en cache des ressources stables
+// 1. Installation du Service Worker et mise en cache des ressources
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -26,7 +27,7 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// 2. Activation et nettoyage automatique des anciens caches pour libérer l'espace
+// 2. Activation et nettoyage automatique des anciens caches
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
@@ -41,15 +42,14 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// 3. Stratégie de Network First : Priorité au réseau avec sauvegarde dynamique pour le mode hors-ligne
+// 3. Stratégie de Network First : Priorité au réseau avec sauvegarde pour le mode hors-ligne
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
       .then((response) => {
-        // Si la requête est réussie, on sauvegarde dynamiquement les images et l'API
         if (response.status === 200 && (
             e.request.url.includes('fakestoreapi.com') || 
-            e.request.url.includes('image') || 
+            e.request.url.includes('images') || 
             e.request.destination === 'image'
         )) {
           const responseClone = response.clone();
@@ -60,7 +60,6 @@ self.addEventListener('fetch', (e) => {
         return response;
       })
       .catch(() => {
-        // Si internet coupe, on récupère directement les données depuis le cache local
         return caches.match(e.request);
       })
   );
