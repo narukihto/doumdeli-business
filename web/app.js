@@ -5,7 +5,7 @@ const API_URL = 'https://fakestoreapi.com/products';
 const EXCHANGE_RATE = 610;
 
 // ضع رقم الواتساب الخاص بمتجرك هنا (مع رمز الدولة بدون أصفار أو علامة +)
-const WHATSAPP_NUMBER = "22370000000"; // استبدل هذا برقمك الحقيقي لاحقاً إذا رغبت
+const WHATSAPP_NUMBER = "22379178766"; // استبدل هذا برقمك الحقيقي لاحقاً إذا رغبت
 
 let totalAmount = 0;
 let itemsCount = 0;
