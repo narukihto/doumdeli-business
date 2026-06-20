@@ -2,24 +2,21 @@
 // 1. CONFIGURATION ET HUBS DE STOCK COUSMIQUE
 // ==========================================
 const API_URL = 'https://fakestoreapi.com/products';
-const EXCHANGE_RATE = 610; // معدل تحويل الأسعار من الدولار إلى FCFA
+const EXCHANGE_RATE = 610;
 
-// رقم الواتساب الخاص بمتجرك الحقيقي بعد التحديث والربط المباشر
 const WHATSAPP_NUMBER = "22379178766"; 
 
-let totalAmount = 0;
-let itemsCount = 0;
-let selectedProducts = [];
 let ALL_PRODUCTS_STORE = []; 
+let cart = {}; // هيكل بيانات السلة المطور لحفظ المنتجات بشكل كائن تفاعلي [productTitle]: {price, quantity}
 let currentCategory = 'TOUT';
 
-// مخزون المنتجات المحلية الضخم والممتد بناءً على ملفات صورك الحقيقية بالملي
+// مخزون المنتجات الحقيقية
 const LOCAL_PRODUCTS = [
     // --- ESPACE BÉBÉ (👶) ---
     { title: "Pack Couches Bébé - Édition Confort 1", price: 12500, description: "Couches pour bébé de haute qualité, douces pour la peau, hypoallergéniques et ultra absorbantes pour des nuits paisibles.", image: "./images/bebe1.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Édition Protection 2", price: 14000, description: "Pack de couches premium anti-fuites avec barrières latérales extensibles, parfaitement adaptées aux mouvements de l'enfant.", image: "./images/bebe2.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Format Économique Pro", price: 18500, description: "Grand format économique qui offre une protection douce, fiable et durable pour toutes les mamans soucieuses du budget.", image: "./images/bebe3.jpg", category: "BÉBÉ" },
-    { title: "Pack Couches Bébé - Format Familial Max", price: 22000, description: "La protection maximale pour les familles. Absorption renforcée jour et nuit avec indicateur d'humidité intégré.", image: "./images/bebe4.jpg", category: "BÉBÉ" },
+    { title: "Pack Couches Bébé - Format Familial Max", price: 22000, description: "La protection maximale pour les familles. Absorption reinforced jour et nuit avec indicateur d'humidité intégré.", image: "./images/bebe4.jpg", category: "BÉBÉ" },
     { title: "Pack Couches Bébé - Plus Ultra Premium", price: 25000, description: "Couches de nouvelle génération ultra-douces à base de coton organique pour les peaux extrêmement sensibles des nouveau-nés.", image: "./images/bebe5.jpg", category: "BÉBÉ" },
     
     // --- ÉLECTRONIQUE (⚡) ---
@@ -30,7 +27,7 @@ const LOCAL_PRODUCTS = [
     { title: "Module Connecté - NextGen v4 Smart", price: 95000, description: "Composant et appareil de haute précision pour optimiser vos installations domestiques et professionnelles intelligentes.", image: "./images/electro4.jpg", category: "ÉLECTRONIQUE" },
     { title: "Station Centrale Électronique - Max Power", price: 145000, description: "Console d'alimentation et de contrôle centralisée avec fusibles de protection intégrés contre les surtensions et coupures.", image: "./images/electro5.jpg", category: "ÉLECTRONIQUE" },
 
-    // --- MATÉRIAUX DE CONSTRUCTION (🧱) - الفرع الجديد الأول ---
+    // --- MATÉRIAUX DE CONSTRUCTION (🧱) ---
     { title: "Matériaux de Construction - Ciment Haute Résistance v1", price: 6500, description: "Sac de ciment de qualité supérieure, idéal pour les fondations lourdes, les dalles et les structures porteuses de chantiers.", image: "./images/Materiaux de construction1.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Lot d'Acier Renforcé v2", price: 48000, description: "Barres de fer et d'acier de construction haute performance, résistantes à la torsion pour armatures de béton.", image: "./images/Materiaux de construction2.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Briques Finies Premium v3", price: 35000, description: "Lot de briques de construction haut de gamme, calibrées avec précision pour une isolation thermique et une solidité maximale.", image: "./images/Materiaux de construction3.jpg", category: "MATÉRIAUX" },
@@ -39,7 +36,7 @@ const LOCAL_PRODUCTS = [
     { title: "Matériaux de Construction - Kit de Fixation Fondations v6", price: 15000, description: "Ensemble complet de visserie, ancrages et fixations industrielles pour gros œuvres et menuiseries lourdes.", image: "./images/Materiaux de construction6.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Outillage Chantier Pro v7", price: 55000, description: "Équipement et outils de maçonnerie professionnels pour accélérer les travaux de construction en toute sécurité.", image: "./images/Materiaux de construction7.jpg", category: "MATÉRIAUX" },
 
-    // --- MERCERIE & COUTURE (🧵) - الفرع الجديد الثاني ---
+    // --- MERCERIE & COUTURE (🧵) ---
     { title: "Pack Mercerie - Fils de Soie Haute Couture v1", price: 8500, description: "Assortiment de fils à coudre de qualité supérieure en soie, couleurs éclatantes pour machines professionnelles.", image: "./images/Mercerie1.jpg", category: "MERCERIE" },
     { title: "Pack Mercerie - Boutons de Luxe Ornementaux v2", price: 4500, description: "Collection exclusive de boutons décoratifs haut de gamme pour sublimer les vestes, robes traditionnelles et bazins.", image: "./images/Mercerie2.jpg", category: "MERCERIE" },
     { title: "Pack Mercerie - Rubans et Dentelles Brodés v3", price: 12000, description: "Rouleaux de dentelles fines et rubans satinés pour finitions de broderies de grand luxe et robes de mariées.", image: "./images/Mercerie3.jpg", category: "MERCERIE" },
@@ -48,7 +45,7 @@ const LOCAL_PRODUCTS = [
     { title: "Pack Mercerie - Accessoires de Mesure et Marquage v6", price: 2500, description: "Ensemble de mètres rubans professionnels, craies de tailleur et outils de traçage pour ateliers de couture.", image: "./images/Mercerie6.jpg", category: "MERCERIE" },
     { title: "Pack Mercerie - Organisateur d'Atelier Complet v7", price: 18000, description: "Mallette de rangement compartimentée contenant tous les accessoires indispensables pour couturiers exigeants.", image: "./images/Mercerie7.jpg", category: "MERCERIE" },
 
-    // --- PIÈCES DÉTACHÉES (⚙️) - الفرع الجديد الثالث ---
+    // --- PIÈCES DÉTACHÉES (⚙️) ---
     { title: "Pièces Détachées - Filtre à Air Haute Performance v1", price: 14500, description: "Filtre mécanique de haute précision pour moteurs de véhicules, optimisant l'admission d'air et la combustion.", image: "./images/Pièces détachées1.jpg", category: "PIÈCES" },
     { title: "Pièces Détachées - Kit de Courroies Renforcées v4", price: 28000, description: "Courroie de distribution et de transmission ultra-résistante à la chaleur pour éviter les pannes moteurs.", image: "./images/Pièces détachées4.jpg", category: "PIÈCES" },
     { title: "Pièces Détachées - Plaquettes de Frein Premium v5", price: 19500, description: "Lot de plaquettes de frein avant/arrière offrant une friction maximale et un freinage sécurisé en toute situation.", image: "./images/Pièces détachées5.jpg", category: "PIÈCES" }
@@ -65,7 +62,6 @@ async function loadStoreData() {
     const productsGrid = document.getElementById('products-grid');
     if (!productsGrid) return;
 
-    // رسالة انتظار كوزمية احترافية
     productsGrid.innerHTML = `
         <div class="col-span-full text-center py-24 text-cyan-400 cosmic-font animate-pulse tracking-widest text-xs">
             🌌 APPLICATION EN COURS DE SYNCHRONISATION AVEC LE DÉPÔT GLOBAL... <br>
@@ -73,23 +69,20 @@ async function loadStoreData() {
         </div>
     `;
 
-    // 1. شحن المنتجات المحلية الـ 17 في الذاكرة أولاً
     ALL_PRODUCTS_STORE = [...LOCAL_PRODUCTS];
 
-    // 2. جلب جميع منتجات الـ API لرميها وتكبير المتجر ليكون طويلاً جداً
     try {
         const response = await fetch(API_URL);
         const apiProducts = await response.json();
 
         apiProducts.forEach(product => {
-            let cat = "AUTRES"; // افتراضياً كل المنتجات العامة تذهب لفرع Autres لتكبيره
+            let cat = "AUTRES"; 
             const apiCat = product.category.toLowerCase();
             
             if (apiCat.includes('electronics')) {
                 cat = "ÉLECTRONIQUE";
             }
 
-            // حقن منتجات الـ API مضروبة في معدل الصرف لتعرض بالـ FCFA بشكل ضخم
             ALL_PRODUCTS_STORE.push({
                 title: product.title,
                 price: Math.round(product.price * EXCHANGE_RATE),
@@ -99,14 +92,14 @@ async function loadStoreData() {
             });
         });
     } catch (error) {
-        console.log("Mode Local Activé avec succès. Les 17 produits physiques sont prioritaires.");
+        console.log("Mode Local Activé. Les محصولات الحقيقية جاهزة.");
     }
 
     renderProducts();
 }
 
 // ==========================================
-// 3. GENERATION DE LA GRILLE DES PRODUITS ET DESIGN CASIER
+// 3. GENERATION DE LA GRILLE DES PRODUITS
 // ==========================================
 function renderProducts() {
     const productsGrid = document.getElementById('products-grid');
@@ -114,7 +107,6 @@ function renderProducts() {
 
     productsGrid.innerHTML = '';
 
-    // تصفية المنتجات بناءً على الفئة المختارة
     const filtered = ALL_PRODUCTS_STORE.filter(p => {
         if (currentCategory === 'TOUT') return true;
         return p.category === currentCategory;
@@ -129,9 +121,10 @@ function renderProducts() {
         return;
     }
 
-    // بناء وتوليد بطاقات المنتجات الطويلة والمصممة بنمط سايبربانك زجاجي مضيء
     filtered.forEach(product => {
         const formattedPrice = new Intl.NumberFormat('fr-FR').format(product.price);
+        // معالجة علامات الاقتباس لتفادي مشاكل الأكواد
+        const safeTitle = product.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         
         const card = document.createElement('div');
         card.className = "group bg-slate-900/40 backdrop-blur-md rounded-2xl p-4 border border-blue-500/5 hover:border-cyan-500/30 transition-all duration-300 flex flex-col justify-between hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] hover:scale-[1.01]";
@@ -152,7 +145,7 @@ function renderProducts() {
                     <span class="text-[10px] text-cyan-400 tracking-widest font-mono font-bold">FCFA</span>
                     <span class="text-base font-black text-slate-100 cosmic-font tracking-wide">${formattedPrice}</span>
                 </div>
-                <button onclick="addToCart('${product.title.replace(/'/g, "\\'")}', ${product.price})" class="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition duration-300 transform active:scale-95 shadow-lg shadow-indigo-600/10 tracking-widest uppercase cosmic-font">
+                <button onclick="addToCart('${safeTitle}', ${product.price})" class="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition duration-300 transform active:scale-95 shadow-lg shadow-indigo-600/10 tracking-widest uppercase cosmic-font">
                     Acheter ✨
                 </button>
             </div>
@@ -162,23 +155,12 @@ function renderProducts() {
 }
 
 // ==========================================
-// 4. CONTROL ET DESIGN ACTIONNELS DES BOUTONS DE FILTRES (7 CATEGORIES)
+// 4. CONTROL DES BOUTONS DE FILTRES
 // ==========================================
 function filterCategory(categoryName) {
     currentCategory = categoryName;
-    
-    // قائمة الفئات السبعة الكاملة لمتجرك الموسع
     const categories = ['TOUT', 'BÉBÉ', 'ÉLECTRONIQUE', 'MATÉRIAUX', 'MERCERIE', 'PIÈCES', 'AUTRES'];
-    
-    const ids = { 
-        'TOUT': 'btn-tout', 
-        'BÉBÉ': 'btn-bebe', 
-        'ÉLECTRONIQUE': 'btn-electronique', 
-        'MATÉRIAUX': 'btn-materiaux', 
-        'MERCERIE': 'btn-mercerie', 
-        'PIÈCES': 'btn-pieces', 
-        'AUTRES': 'btn-autres' 
-    };
+    const ids = { 'TOUT': 'btn-tout', 'BÉBÉ': 'btn-bebe', 'ÉLECTRONIQUE': 'btn-electronique', 'MATÉRIAUX': 'btn-materiaux', 'MERCERIE': 'btn-mercerie', 'PIÈCES': 'btn-pieces', 'AUTRES': 'btn-autres' };
 
     categories.forEach(cat => {
         const btn = document.getElementById(ids[cat]);
@@ -191,26 +173,94 @@ function filterCategory(categoryName) {
     });
 
     renderProducts();
-    
-    // التمرير التلقائي لأول المنتجات عند الضغط لسهولة التصفح
     document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 // ==========================================
-// 5. GESTION FLUIDE DU PANIER COUSMIQUE
+// 5. ENGINE DE GESTION DU PANIER (إضافة، تعديل، وحذف كامل)
 // ==========================================
-function addToCart(productName, price) {
-    totalAmount += price;
-    itemsCount += 1;
-    selectedProducts.push(productName);
 
-    // تحديث العدادات الفورية في الواجهة
-    document.getElementById('cart-count').innerText = itemsCount;
-    document.getElementById('total-price').innerText = totalAmount.toLocaleString('fr-FR') + " FCFA";
-    
-    // دمج وعرض المنتجات الفريدة بشكل منسق داخل الفاتورة
-    const uniqueItems = [...new Set(selectedProducts)];
-    document.getElementById('selected-items-list').innerText = uniqueItems.join(' || ');
+// أ: دالة الإضافة الأساسية للسلة
+function addToCart(productName, price) {
+    if (cart[productName]) {
+        cart[productName].quantity += 1;
+    } else {
+        cart[productName] = { price: price, quantity: 1 };
+    }
+    updateCartUI();
+}
+
+// ب: دالة تقليل كمية المنتج بـ 1 زر (-)
+function decreaseQuantity(productName) {
+    if (cart[productName]) {
+        cart[productName].quantity -= 1;
+        if (cart[productName].quantity <= 0) {
+            delete cart[productName]; // حذف تلقائي إذا وصلت الكمية لصفر
+        }
+    }
+    updateCartUI();
+}
+
+// ج: دالة الحذف الكلي والنهائي للمنتج زر (🗑️)
+function removeFromCart(productName) {
+    if (cart[productName]) {
+        delete cart[productName];
+    }
+    updateCartUI();
+}
+
+// د: تحديث وعرض واجهة السلة والفاتورة التفاعلية بالكامل
+function updateCartUI() {
+    const itemsContainer = document.getElementById('cart-items-container');
+    const cartCountEl = document.getElementById('cart-count');
+    const totalPriceEl = document.getElementById('total-price');
+
+    if (!itemsContainer) return;
+
+    itemsContainer.innerHTML = '';
+    let totalAmount = 0;
+    let totalItems = 0;
+
+    const productsInCart = Object.keys(cart);
+
+    if (productsInCart.length === 0) {
+        itemsContainer.innerHTML = `<p id="empty-cart-message" class="text-gray-500 italic py-4">Aucun produit dans le panier. Explorez le catalogue pour ajouter des articles.</p>`;
+        cartCountEl.innerText = 0;
+        totalPriceEl.innerText = "0 FCFA";
+        return;
+    }
+
+    // بناء الأسطر التفاعلية للمنتجات داخل الفاتورة
+    productsInCart.forEach(name => {
+        const item = cart[name];
+        const itemTotal = item.price * item.quantity;
+        totalAmount += itemTotal;
+        totalItems += item.quantity;
+
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between bg-slate-950/50 p-2.5 rounded-xl border border-white/5 gap-2 transition hover:border-blue-900/40";
+        
+        // تجهيز الاسم البرمجي الآمن لتمريره في الأزرار
+        const safeName = name.replace(/'/g, "\\'");
+
+        row.innerHTML = `
+            <div class="flex-1 min-w-0">
+                <h4 class="text-slate-200 font-semibold truncate text-[11px]" title="${name}">${name}</h4>
+                <p class="text-[10px] text-cyan-400 font-mono">${item.price.toLocaleString('fr-FR')} x ${item.quantity} = ${itemTotal.toLocaleString('fr-FR')} FCFA</p>
+            </div>
+            <div class="flex items-center space-x-1.5 flex-shrink-0">
+                <button onclick="decreaseQuantity('${safeName}')" class="w-5 h-5 bg-slate-900 text-gray-400 rounded-md flex items-center justify-center font-bold hover:bg-slate-800 hover:text-white transition text-xs">-</button>
+                <span class="text-xs font-bold font-mono px-1 text-slate-300">${item.quantity}</span>
+                <button onclick="addToCart('${safeName}', ${item.price})" class="w-5 h-5 bg-slate-900 text-gray-400 rounded-md flex items-center justify-center font-bold hover:bg-slate-800 hover:text-white transition text-xs">+</button>
+                <button onclick="removeFromCart('${safeName}')" class="w-5 h-5 bg-red-950/40 text-red-400 rounded-md flex items-center justify-center hover:bg-red-900 hover:text-white transition text-[10px]" title="Supprimer">🗑️</button>
+            </div>
+        `;
+        itemsContainer.appendChild(row);
+    });
+
+    // تحديث الأرقام الكلية للعداد والفاتورة
+    cartCountEl.innerText = totalItems;
+    totalPriceEl.innerText = totalAmount.toLocaleString('fr-FR') + " FCFA";
 }
 
 // ==========================================
@@ -219,23 +269,20 @@ function addToCart(productName, price) {
 function submitCosmicOrder(event) {
     event.preventDefault();
     
-    if (totalAmount === 0 || selectedProducts.length === 0) {
+    const productsInCart = Object.keys(cart);
+    
+    if (productsInCart.length === 0) {
         alert("⚠️ Votre panier est vide. Veuillez sélectionner des articles du catalogue interdimensionnel avant de commander.");
         return;
     }
 
-    // سحب بيانات استمارة الشحن من العميل باماكو
     const nomClient = document.getElementById('customer-name').value.trim();
     const telephoneClient = document.getElementById('customer-phone').value.trim();
     const adresseClient = document.getElementById('customer-address').value.trim();
 
-    // فرز وحساب الكميات المكررة لكل منتج تم شراؤه
-    const productCounts = {};
-    selectedProducts.forEach(name => {
-        productCounts[name] = (productCounts[name] || 0) + 1;
-    });
+    // حساب الإجمالي العام أثناء إعداد الرسالة
+    let calculatedTotal = 0;
 
-    // صياغة رسالة الفاتورة الكونية الطويلة والاحترافية جداً للواتساب
     let messageTxt = `🌌 *NOUVELLE COMMANDE GLOBAL - DOUMDELI BUSINESS* 🌌\n`;
     messageTxt += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     messageTxt += `👤 *DÉTAILS DU DESTINATAIRE :*\n`;
@@ -245,30 +292,36 @@ function submitCosmicOrder(event) {
     
     messageTxt += `📦 *BORDEREAU DES ARTICLES COMMANDÉS :*\n`;
     messageTxt += `----------------------------------------------------------\n`;
-    for (const [name, count] of Object.entries(productCounts)) {
-        messageTxt += `🔹 _${name}_ \n    *Quantité :* x${count}\n`;
-    }
+    
+    // بناء الأسطر في رسالة الواتساب بالكميات والأسعار الفرعية
+    productsInCart.forEach(name => {
+        const item = cart[name];
+        const subTotal = item.price * item.quantity;
+        calculatedTotal += subTotal;
+        
+        messageTxt += `🔹 _${name}_ \n`;
+        messageTxt += `    *Quantité :* x${item.quantity} \n`;
+        messageTxt += `    *Prix :* ${subTotal.toLocaleString('fr-FR')} FCFA\n`;
+        messageTxt += `    --------------------------------------\n`;
+    });
+    
     messageTxt += `----------------------------------------------------------\n\n`;
-    
-    messageTxt += `💰 *MONTANT TOTAL À PAYER (COD) :* ${totalAmount.toLocaleString('fr-FR')} FCFA\n\n`;
+    messageTxt += `💰 *MONTANT TOTAL À PAYER (COD) :* ${calculatedTotal.toLocaleString('fr-FR')} FCFA\n\n`;
     messageTxt += `🚀 *LOGISTIQUE :* Expédition validée. Paiement de main à main après vérification complète du colis auprès du livreur.\n\n`;
-    messageTxt += `🛸 _Système automatisé Doumdeli Core v3.5 - Bamako, Mali._`;
+    messageTxt += `🛸 _Système automatisé Doumdeli Core v4.0 - Bamako, Mali._`;
 
-    // ترميز نصوص الرسالة لتتوافق مع روابط المتصفحات بأمان
     const encodedMessage = encodeURIComponent(messageTxt);
-    
-    // إطلاق المنظومة وفتح شات الواتساب مباشرة بالفاتورة الجاهزة
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
 }
 
 // ==========================================
-// 7. SYSTEME DE CASHE INTÉGRÉ (OFFLINE NAVIGATION)
+// 7. SYSTEME DE CACHE INTÉGRÉ (OFFLINE NAVIGATION)
 // ==========================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker Global Doumdeli Connecté avec succès !'))
+            .then(reg => console.log('Service Worker Global Doumdeli Connecté.'))
             .catch(err => console.log('SW Registration Error', err));
     });
 }
