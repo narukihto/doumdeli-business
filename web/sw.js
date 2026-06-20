@@ -6,14 +6,14 @@ const STATIC_ASSETS = [
   './index.html',
   './app.js',
   './manifest.json',
-  './images/1 حزمة حفاضات أطفال .jpg',
-  './images/2 حزمة حفاضات أطفال .jpg',
-  './images/3 حزمة حفاضات أطفال .jpg',
-  './images/4 حزمة حفاضات أطفال .jpg',
-  './images/5 حزمة حفاضات أطفال .jpg',
-  './images/1 اجهزه.jpg',
-  './images/3 اجهزه.jpg',
-  './images/5 اجهز.jpg',
+  './images/1حزمة حفاضات أطفال .jpg',
+  './images/2حزمة حفاضات أطفال .jpg',
+  './images/3حزمة حفاضات أطفال .jpg',
+  './images/4حزمة حفاضات أطفال .jpg',
+  './images/5حزمة حفاضات أطفال .jpg',
+  './images/1اجهزه.jpg',
+  './images/3اجهزه.jpg',
+  './images/5اجهز.jpg',
   './images/IMG-20260618-WA0056.jpg'
 ];
 
