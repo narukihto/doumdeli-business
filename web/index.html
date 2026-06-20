@@ -14,7 +14,6 @@
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .space-gradient { background: radial-gradient(circle at top, #0b112c 0%, #03001e 100%); }
         
-        /* تأثير حركة شريط الإعلانات العلوي */
         @keyframes marquee {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -24,10 +23,8 @@
 </head>
 <body class="space-gradient min-h-screen text-gray-100 overflow-x-hidden relative">
 
-    <!-- خلفية النجوم الكوزمية الجمالية -->
     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-40 pointer-events-none"></div>
 
-    <!-- 1. شريط الإعلانات المتحرك العلوي الممتد -->
     <div class="w-full bg-gradient-to-r from-blue-950 via-indigo-900 to-cyan-950 text-white text-[11px] font-bold cosmic-font tracking-widest py-2 border-b border-cyan-500/20 overflow-hidden relative z-50">
         <div class="whitespace-nowrap flex animate-marquee space-x-10">
             <span>🚀 LIVRAISON RAPIDE À BAMAKO EN MOINS DE 24 HEURES</span>
@@ -38,7 +35,6 @@
         </div>
     </div>
 
-    <!-- 2. الهيدر الأساسي للمنصة -->
     <header class="glass-card sticky top-0 z-50 px-6 py-4 shadow-2xl border-b border-blue-900/30">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -49,13 +45,11 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <!-- مؤشر المزامنة الحية مع المستودعات -->
                 <div class="hidden lg:flex items-center space-x-2 bg-slate-950/60 px-3 py-1.5 rounded-full border border-green-500/20 text-[10px] cosmic-font text-green-400">
                     <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
                     <span>GLOBAL STORAGE SYNC ACTIVATED</span>
                 </div>
                 
-                <!-- سلة المشتريات العائمة -->
                 <a href="#checkout-section" class="glass-card bg-blue-950/40 px-4 py-2 rounded-full border border-cyan-500/30 flex items-center space-x-3 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:border-cyan-400 transition">
                     <span class="text-cyan-400">🛒 Panier:</span>
                     <span id="cart-count" class="bg-gradient-to-r from-blue-500 to-cyan-500 px-2.5 py-0.5 text-xs font-bold rounded-full cosmic-font shadow-lg">0</span>
@@ -64,7 +58,6 @@
         </div>
     </header>
 
-    <!-- 3. قسم الترحيب البانورامي الضخم (Hero Section) -->
     <section class="container mx-auto mt-8 px-4">
         <div class="relative glass-card rounded-3xl p-8 md:p-16 overflow-hidden shadow-[0_0_60px_rgba(30,58,138,0.3)] border border-blue-500/20 bg-gradient-to-br from-indigo-950/50 via-purple-950/10 to-black/60 text-center">
             <div class="absolute -top-24 -left-24 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -88,7 +81,6 @@
         </div>
     </section>
 
-    <!-- 4. قسم مميزات وضمانات المتجر المطور (Core Promises) -->
     <section class="container mx-auto mt-12 px-4 max-w-6xl">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="glass-card p-6 rounded-2xl border border-blue-500/10 text-center hover:border-blue-500/30 hover:scale-[1.02] transition duration-300">
@@ -114,7 +106,6 @@
         </div>
     </section>
 
-    <!-- 5. شريط إحصائيات المنصة الكوزمية (Cosmic Hub Stats) - يضيف فخامة وطول للموقع -->
     <section class="container mx-auto mt-16 px-4 max-w-6xl">
         <div class="glass-card rounded-2xl p-6 bg-slate-950/50 border border-blue-500/5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -136,7 +127,6 @@
         </div>
     </section>
 
-    <!-- 6. قسم أزرار التصنيفات والفلاتر الممتد (الآن يحتوي على فروعك الجديدة كاملة) -->
     <section id="catalog-section" class="container mx-auto mt-20 px-4 text-center">
         <span class="cosmic-font text-[10px] tracking-[0.4em] text-cyan-400 font-bold block mb-2">SELECTION DIMENSIONNELLE</span>
         <h3 class="cosmic-font text-xl md:text-3xl font-black mb-8 tracking-wider">PARCOURIR LES GRANDES CATEGORIES</h3>
@@ -151,15 +141,12 @@
             <button onclick="filterCategory('ÉLECTRONIQUE')" id="btn-electronique" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider text-gray-400 hover:text-white hover:bg-white/5">
                 ⚡ ÉLECTRONIQUE
             </button>
-            <!-- الزر الجديد لمواد البناء -->
             <button onclick="filterCategory('MATÉRIAUX')" id="btn-materiaux" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider text-gray-400 hover:text-white hover:bg-white/5">
                 🧱 MATÉRIAUX
             </button>
-            <!-- الزر الجديد للخياطة -->
             <button onclick="filterCategory('MERCERIE')" id="btn-mercerie" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider text-gray-400 hover:text-white hover:bg-white/5">
                 🧵 MERCERIE
             </button>
-            <!-- الزر الجديد لقطع الغيار -->
             <button onclick="filterCategory('PIÈCES')" id="btn-pieces" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider text-gray-400 hover:text-white hover:bg-white/5">
                 ⚙️ PIÈCES DÉTACHÉES
             </button>
@@ -169,35 +156,29 @@
         </div>
     </section>
 
-    <!-- 7. شبكة عرض المنتجات العملاقة المفتوحة -->
     <main class="container mx-auto p-6 mt-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
-            <!-- سيتم حقن مخزون المنتجات الضخم وداتا الـ API بالكامل هنا بواسطة الجافا سكريبت -->
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid"></div>
 
-        <!-- 8. قسم الفاتورة الكونية واستمارة الشحن المدمجة (Checkout Section) -->
         <div id="checkout-section" class="mt-24 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto pt-12 border-t border-blue-900/30">
 
-            <!-- الفاتورة ومراجعة المشتريات ممتدة -->
             <div class="glass-card p-6 rounded-3xl border border-cyan-500/20 bg-gradient-to-b from-blue-950/30 to-black/80 shadow-xl flex flex-col justify-between">
                 <div>
-                    <h3 class="cosmic-font text-sm font-bold mb-4 text-cyan-400 tracking-widest uppercase">1. VOTRE COMMANDE (CASH ON DELIVERY)</h3>
+                    <h3 class="cosmic-font text-sm font-bold mb-4 text-cyan-400 tracking-widest uppercase">1. VOTRE PANIER INTERACTIF</h3>
                     <div class="text-4xl font-black text-white mb-4 cosmic-font tracking-wide neon-glow" id="total-price">0 FCFA</div>
                     <div class="w-full h-px bg-white/10 my-3"></div>
-                    <p class="text-xs text-cyan-300/80 mb-4 font-mono leading-relaxed">
-                        Articles sélectionnés: <br>
-                        <span id="selected-items-list" class="text-white font-sans text-xs font-semibold block mt-1">Aucun produit dans le panier</span>
-                    </p>
+                    
+                    <div id="cart-items-container" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar text-xs">
+                        <p id="empty-cart-message" class="text-gray-500 italic py-4">Aucun produit dans le panier. Explorez le catalogue pour ajouter des articles.</p>
+                    </div>
                 </div>
-                <div class="space-y-3 mt-6">
+                <div class="space-y-3 mt-6 pt-4 border-t border-white/5">
                     <p class="text-[11px] text-gray-400 leading-relaxed bg-blue-950/40 p-3 rounded-xl border border-blue-900/40">
-                        🚀 <strong>Note de Livraison :</strong> Service Cash on Delivery activé. Vous ne payez absolument rien en ligne. Tout se fait de main à main à Bamako après vérification et entière satisfaction.
+                        🚀 <strong>Note de Livraison :</strong> Service Cash on Delivery activé. Vous payez de main à main à Bamako après vérification et entière satisfaction de votre colis.
                     </p>
                     <p class="text-[10px] text-cyan-400/70 italic">🛡️ Garantie de retour de 48 heures en cas de défaut d'usine.</p>
                 </div>
             </div>
 
-            <!-- استمارة تأكيد البيانات الشخصية للزبون للواتساب -->
             <div id="checkout-form-container" class="glass-card p-6 rounded-3xl border border-blue-500/20 bg-gradient-to-b from-blue-950/20 to-black/90 shadow-xl">
                 <h3 class="cosmic-font text-sm font-bold mb-4 text-blue-400 tracking-widest uppercase">2. INFORMATION DE LIVRAISON DIRECTE</h3>
                 <form id="orderForm" onsubmit="submitCosmicOrder(event)" class="space-y-4">
@@ -222,7 +203,6 @@
         </div>
     </main>
 
-    <!-- 9. قسم تقييمات العملاء الممتد (Cosmic Testimonials) - لإضافة طول ومصداقية للمنصة -->
     <section class="container mx-auto mt-24 px-4 max-w-5xl">
         <div class="text-center mb-12">
             <span class="cosmic-font text-[10px] tracking-[0.3em] text-purple-400 font-bold block mb-2">COMMUNAUTÉ DOUMDELI</span>
@@ -232,22 +212,21 @@
             <div class="glass-card p-5 rounded-2xl border border-blue-900/20 bg-slate-950/30">
                 <div class="flex items-center space-x-2 text-yellow-400 text-sm mb-2">⭐⭐⭐⭐⭐</div>
                 <p class="text-xs text-gray-300 italic mb-3">"J'ai commandé des packs de couches pour bébé et la livraison a été effectuée à Sotoba en moins de 5 heures. Très professionnel, je recommande !"</p>
-                <span class="text-[10px] cosmic-font text-cyan-400">- Fanta K.</span class="text-gray-500"> (Sotoba)</span>
+                <span class="text-[10px] cosmic-font text-cyan-400">- Fanta K.</span><span class="text-gray-500"> (Sotoba)</span>
             </div>
             <div class="glass-card p-5 rounded-2xl border border-blue-900/20 bg-slate-950/30">
                 <div class="flex items-center space-x-2 text-yellow-400 text-sm mb-2">⭐⭐⭐⭐⭐</div>
                 <p class="text-xs text-gray-300 italic mb-3">"Le service de pièces détachées et les matériaux de construction sont top. Le livreur est venu jusqu'à mon chantier à Kalaban Coro. Chapeau."</p>
-                <span class="text-[10px] cosmic-font text-blue-400">- Moussa D.</span class="text-gray-500"> (Kalaban Coro)</span>
+                <span class="text-[10px] cosmic-font text-blue-400">- Moussa D.</span><span class="text-gray-500"> (Kalaban Coro)</span>
             </div>
             <div class="glass-card p-5 rounded-2xl border border-blue-900/20 bg-slate-950/30">
                 <div class="flex items-center space-x-2 text-yellow-400 text-sm mb-2">⭐⭐⭐⭐⭐</div>
                 <p class="text-xs text-gray-300 italic mb-3">"Achat d'un pack mercerie complet pour mon atelier de couture. Qualité irréprochable et livraison conforme à la description. Merci Doumdeli."</p>
-                <span class="text-[10px] cosmic-font text-purple-400">- Mariam T.</span class="text-gray-500"> (ACI 2000)</span>
+                <span class="text-[10px] cosmic-font text-purple-400">- Mariam T.</span><span class="text-gray-500"> (ACI 2000)</span>
             </div>
         </div>
     </section>
 
-    <!-- 10. قسم الأسئلة الشائعة الموسع جداً والمضاعف (Extended F.A.Q) -->
     <section id="faq-section" class="container mx-auto mt-24 px-4 max-w-4xl mb-16">
         <div class="text-center mb-12">
             <span class="cosmic-font text-[10px] tracking-[0.3em] text-cyan-400 font-bold block mb-2">INFO & LOGISTIQUE</span>
@@ -257,7 +236,7 @@
         <div class="space-y-4">
             <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
                 <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Comment passer une commande sur la plateforme Doumdeli ?</h4>
-                <p class="text-xs text-gray-400 leading-relaxed">Il vous suffit de parcourir le catalogue, de choisir vos articles en cliquant sur "Acheter". Une fois votre sélection terminée, remplissez l' استمارة (formulaire) avec votre nom, téléphone et quartier à Bamako, puis validez. Le système prépare automatiquement votre bordereau et vous redirige vers notre ligne WhatsApp commerciale.</p>
+                <p class="text-xs text-gray-400 leading-relaxed">Il vous suffit de parcourir le catalogue, de choisir vos articles en cliquant sur "Acheter". Une fois votre sélection terminée, remplissez le formulaire avec votre nom, téléphone et quartier à Bamako, puis validez. Le système prépare automatiquement votre bordereau et vous redirige vers notre ligne WhatsApp commerciale.</p>
             </div>
             
             <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
@@ -267,23 +246,4 @@
             
             <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
                 <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Le paiement à la livraison (COD) engendre-t-il des frais cachés ?</h4>
-                <p class="text-xs text-gray-400 leading-relaxed">Absolument aucun frais caché. Le prix affiché lors de votre validation finale est le prix exact que vous payerez de main à main. Les frais de livraison standards à Bamako vous seront confirmés de manière transparente par notre agent sur WhatsApp avant le départ du coursier.</p>
-            </div>
-
-            <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
-                <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ D'où proviennent les articles de la catégorie "Autres Produits" ?</h4>
-                <p class="text-xs text-gray-400 leading-relaxed">Pour rendre notre catalogue infini et gigantesque, notre système est interconnecté en temps réel via API avec un réseau de fournisseurs internationaux de confiance. Ces articles haut de gamme couvrent la mode, la bijouterie et les gadgets du quotidien, convertis automatiquement au taux local en FCFA pour faciliter vos achats.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 11. الفوتر الكوزمي النهائي الممتد -->
-    <footer class="border-t border-blue-950/60 py-10 text-center text-xs text-gray-500 cosmic-font tracking-widest bg-black/40">
-        <p class="mb-2">&copy; 2026 DOUMDELI BUSINESS. GLOBAL SYSTEM ONLINE.</p>
-        <p class="text-[10px] text-gray-600 font-mono">CORE V3.5 // ALL DIMENSIONS AND DEPOTS SECURED // BAMAKO - MALI</p>
-    </footer>
-
-    <!-- ربط السكريبت الأساسي لتشغيل المنصة بالكامل -->
-    <script src="app.js"></script>
-</body>
-</html>
+                
