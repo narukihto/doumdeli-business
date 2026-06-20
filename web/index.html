@@ -13,7 +13,7 @@
         .neon-glow { text-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.4); }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .space-gradient { background: radial-gradient(circle at top, #0b112c 0%, #03001e 100%); }
-        
+
         @keyframes marquee {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -43,13 +43,13 @@
                     DOUMDELI BUSINESS
                 </h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
                 <div class="hidden lg:flex items-center space-x-2 bg-slate-950/60 px-3 py-1.5 rounded-full border border-green-500/20 text-[10px] cosmic-font text-green-400">
                     <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
                     <span>GLOBAL STORAGE SYNC ACTIVATED</span>
                 </div>
-                
+
                 <a href="#checkout-section" class="glass-card bg-blue-950/40 px-4 py-2 rounded-full border border-cyan-500/30 flex items-center space-x-3 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:border-cyan-400 transition">
                     <span class="text-cyan-400">🛒 Panier:</span>
                     <span id="cart-count" class="bg-gradient-to-r from-blue-500 to-cyan-500 px-2.5 py-0.5 text-xs font-bold rounded-full cosmic-font shadow-lg">0</span>
@@ -130,7 +130,7 @@
     <section id="catalog-section" class="container mx-auto mt-20 px-4 text-center">
         <span class="cosmic-font text-[10px] tracking-[0.4em] text-cyan-400 font-bold block mb-2">SELECTION DIMENSIONNELLE</span>
         <h3 class="cosmic-font text-xl md:text-3xl font-black mb-8 tracking-wider">PARCOURIR LES GRANDES CATEGORIES</h3>
-        
+
         <div class="inline-flex flex-wrap justify-center gap-3 p-3 rounded-2xl glass-card bg-slate-950/60 border border-white/5 max-w-5xl mx-auto">
             <button onclick="filterCategory('TOUT')" id="btn-tout" class="cosmic-font text-xs px-5 py-2.5 rounded-xl transition duration-300 font-bold tracking-wider bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg">
                 🚀 TOUT EXPLORER
@@ -157,6 +157,7 @@
     </section>
 
     <main class="container mx-auto p-6 mt-4">
+        <!-- شبكة عرض المنتجات المصححة والمربوطة بالجافاسكريبت تلقائياً -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid"></div>
 
         <div id="checkout-section" class="mt-24 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto pt-12 border-t border-blue-900/30">
@@ -166,7 +167,7 @@
                     <h3 class="cosmic-font text-sm font-bold mb-4 text-cyan-400 tracking-widest uppercase">1. VOTRE PANIER INTERACTIF</h3>
                     <div class="text-4xl font-black text-white mb-4 cosmic-font tracking-wide neon-glow" id="total-price">0 FCFA</div>
                     <div class="w-full h-px bg-white/10 my-3"></div>
-                    
+
                     <div id="cart-items-container" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar text-xs">
                         <p id="empty-cart-message" class="text-gray-500 italic py-4">Aucun produit dans le panier. Explorez le catalogue pour ajouter des articles.</p>
                     </div>
@@ -232,18 +233,26 @@
             <span class="cosmic-font text-[10px] tracking-[0.3em] text-cyan-400 font-bold block mb-2">INFO & LOGISTIQUE</span>
             <h3 class="cosmic-font text-xl md:text-2xl font-black tracking-wider">QUESTIONS FRÉQUENTES (F.A.Q)</h3>
         </div>
-        
+
         <div class="space-y-4">
             <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
                 <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Comment passer une commande sur la plateforme Doumdeli ?</h4>
                 <p class="text-xs text-gray-400 leading-relaxed">Il vous suffit de parcourir le catalogue, de choisir vos articles en cliquant sur "Acheter". Une fois votre sélection terminée, remplissez le formulaire avec votre nom, téléphone et quartier à Bamako, puis validez. Le système prépare automatiquement votre bordereau et vous redirige vers notre ligne WhatsApp commerciale.</p>
             </div>
-            
+
             <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
                 <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Quels sont vos délais de livraison réels pour les articles lourds (Matériaux/Pièces) ?</h4>
                 <p class="text-xs text-gray-400 leading-relaxed">Pour l'espace bébé, l'électronique et la mercerie, la livraison prend généralement entre 2 et 6 heures à Bamako. Pour les matériaux de construction lourds ou volumineux, nous organisons une expédition sécurisée par camionnette de livraison sous 12 à 24 heures maximum, en parfaite coordination avec le gestionnaire de votre chantier.</p>
             </div>
-            
+
             <div class="glass-card p-5 rounded-2xl border border-blue-900/40 bg-slate-950/20">
                 <h4 class="cosmic-font text-xs font-bold text-cyan-400 mb-2">❓ Le paiement à la livraison (COD) engendre-t-il des frais cachés ?</h4>
-                
+                <p class="text-xs text-gray-400 leading-relaxed">Absolument aucun frais caché. Le montant total affiché dans votre panier interactif est exactement ce que vous paierez au livreur. La transparence fait partie de notre charte d'engagement.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ربط ملف الجافاسكريبت المحدث والمطابق للمعرفات -->
+    <script src="app.js"></script>
+</body>
+</html>
