@@ -2,9 +2,9 @@
 // 1. CONFIGURATION ET HUBS DE STOCK COUSMIQUE
 // ==========================================
 const API_URL = 'https://fakestoreapi.com/products';
-const EXCHANGE_RATE = 610; // معدل تحويل الأسعار من الدولار إلى FCFA
+const EXCHANGE_RATE = 610; // Taux de conversion USD vers FCFA
 
-// رقم الواتساب الخاص بمتجرك الحقيقي بعد التحديث والربط المباشر
+// Numéro officiel de la boutique pour la réception des commandes
 const WHATSAPP_NUMBER = "22379178766"; 
 
 let totalAmount = 0;
@@ -13,10 +13,10 @@ let selectedProducts = [];
 let ALL_PRODUCTS_STORE = []; 
 let currentCategory = 'TOUT';
 
-// نظام كائن السلة الجديد لإدارة الكميات والحذف بسهولة بدون أخطاء
+// Structure du panier pour optimiser les calculs, l'ajustement des quantités et la suppression
 let modernCart = {};
 
-// مخزون المنتجات المحلية الضخم والممتد بناءً على ملفات صورك الحقيقية بالملي
+// Catalogue étendu des 17 produits physiques locaux répartis par dimensions
 const LOCAL_PRODUCTS = [
     // --- ESPACE BÉBÉ (👶) ---
     { title: "Pack Couches Bébé - Édition Confort 1", price: 12500, description: "Couches pour bébé de haute qualité, douces pour la peau, hypoallergéniques et ultra absorbantes pour des nuits paisibles.", image: "./images/bebe1.jpg", category: "BÉBÉ" },
@@ -28,7 +28,7 @@ const LOCAL_PRODUCTS = [
     // --- ÉLECTRONIQUE (⚡) ---
     { title: "Smart Balance Scooter Pro Dynamic", price: 175000, description: "Scooter électrique intelligent de pointe avec gyroscope stabilisateur, lumières LED futuristes et batterie haute autonomie.", image: "./images/Balance scooter 1 .jpg", category: "ÉLECTRONIQUE" },
     { title: "Appareil Électronique Intelligent - Alpha 1", price: 85000, description: "Dernière technologie intelligente avec des performances puissantes, un design moderne et une connectivité réseau optimisée.", image: "./images/electro1.jpg", category: "ÉLECTRONIQUE" },
-    { title: "Système Électronique Avancé - Quantum 3", price: 120000, description: "Outil technologique de pointe offering une grande efficacité énergétique et des fonctionnalités automatisées avancées.", image: "./images/electro2.jpg", category: "ÉLECTRONIQUE" },
+    { title: "Système Électronique Avancé - Quantum 3", price: 120000, description: "Outil technologique de pointe offrant une grande efficacité énergétique et des fonctionnalités automatisées avancées.", image: "./images/electro2.jpg", category: "ÉLECTRONIQUE" },
     { title: "Édition de Luxe - Tech Pro 5 Turbo", price: 165000, description: "Version premium de luxe combinant puissance brute, processeur accéléré et fonctionnalités de nouvelle génération.", image: "./images/electro3.jpg", category: "ÉLECTRONIQUE" },
     { title: "Module Connecté - NextGen v4 Smart", price: 95000, description: "Composant et appareil de haute précision pour optimiser vos installations domestiques et professionnelles intelligentes.", image: "./images/electro4.jpg", category: "ÉLECTRONIQUE" },
     { title: "Station Centrale Électronique - Max Power", price: 145000, description: "Console d'alimentation et de contrôle centralisée avec fusibles de protection intégrés contre les surtensions et coupures.", image: "./images/electro5.jpg", category: "ÉLECTRONIQUE" },
@@ -36,7 +36,7 @@ const LOCAL_PRODUCTS = [
     // --- MATÉRIAUX DE CONSTRUCTION (🧱) ---
     { title: "Matériaux de Construction - Ciment Haute Résistance v1", price: 6500, description: "Sac de ciment de qualité supérieure, idéal pour les fondations lourdes, les dalles et les structures porteuses de chantiers.", image: "./images/Materiaux de construction1.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Lot d'Acier Renforcé v2", price: 48000, description: "Barres de fer et d'acier de construction haute performance, résistantes à la torsion pour armatures de béton.", image: "./images/Materiaux de construction2.jpg", category: "MATÉRIAUX" },
-    { title: "Matériaux de Construction - Briques Finies Premium v3", price: 35000, description: "Lot de briques de construction haut de gamme, calibrées avec précision pour une isolation thermique et une solidité maxima.", image: "./images/Materiaux de construction3.jpg", category: "MATÉRIAUX" },
+    { title: "Matériaux de Construction - Briques Finies Premium v3", price: 35000, description: "Lot de briques de construction haut de gamme, calibrées avec précision pour une isolation thermique et une solidité maximale.", image: "./images/Materiaux de construction3.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Revêtement Extérieur Protect v4", price: 22500, description: "Enduit et mortier spécial pour façades extérieures offrant une protection étanche contre les intempéries et la chaleur.", image: "./images/Materiaux de construction4.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Peinture Isolante Spéciale v5", price: 32000, description: "Seau de peinture professionnelle longue durée, anti-fissures et lavable pour intérieurs et extérieurs modernes.", image: "./images/Materiaux de construction5.jpg", category: "MATÉRIAUX" },
     { title: "Matériaux de Construction - Kit de Fixation Fondations v6", price: 15000, description: "Ensemble complet de visserie, ancrages et fixations industrielles pour gros œuvres et menuiseries lourdes.", image: "./images/Materiaux de construction6.jpg", category: "MATÉRIAUX" },
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 2. RECUPERATION ET FUSION GIGANTESQUE DE TOUTES LES DONNEES
+// 2. RECUPERATION ET FUSION GLOBAL DES APIS
 // ==========================================
 async function loadStoreData() {
     const productsGrid = document.getElementById('products-grid');
@@ -105,7 +105,7 @@ async function loadStoreData() {
 }
 
 // ==========================================
-// 3. GENERATION DE LA GRILLE DES PRODUITS ET DESIGN CASIER
+// 3. GENERATION DE LA GRILLE DES PRODUITS
 // ==========================================
 function renderProducts() {
     const productsGrid = document.getElementById('products-grid');
@@ -160,7 +160,7 @@ function renderProducts() {
 }
 
 // ==========================================
-// 4. CONTROL ET DESIGN ACTIONNELS DES BOUTONS DE FILTRES
+// 4. FILTRES DES CATÉGORIES ET NAVIGATION SMOOTH
 // ==========================================
 function filterCategory(categoryName) {
     currentCategory = categoryName;
@@ -183,7 +183,7 @@ function filterCategory(categoryName) {
 }
 
 // ==========================================
-// 5. GESTION DU PANIER INTERACTIF (AJOUT / QUANTITÉ / SUPPRESSION)
+// 5. GESTION DYNAMIQUE DU PANIER (AJOUT / QUANTITÉ / SUPPRESSION)
 // ==========================================
 function addToCart(productName, price) {
     if (modernCart[productName]) {
@@ -211,7 +211,6 @@ function removeProductEntirely(productName) {
     }
 }
 
-// دالة الحسابات المربوطة بالكامل وبأمان مع معرّفات الـ HTML الخاصة بكِ
 function syncAndRenderCart() {
     totalAmount = 0;
     itemsCount = 0;
@@ -229,7 +228,6 @@ function syncAndRenderCart() {
     if(document.getElementById('cart-count')) document.getElementById('cart-count').innerText = itemsCount;
     if(document.getElementById('total-price')) document.getElementById('total-price').innerText = totalAmount.toLocaleString('fr-FR') + " FCFA";
 
-    // الربط الصحيح والمباشر مع الـ Container الخاص بملفكِ الـ HTML
     const cartContainer = document.getElementById('cart-items-container');
 
     if (cartContainer) {
@@ -261,7 +259,7 @@ function syncAndRenderCart() {
 }
 
 // ==========================================
-// 6. EXPEDITION SECURISEE DE LA FACTURE SUR WHATSAPP
+// 6. SÉCURISATION ET ENVOI DE LA COMMANDE SUR WHATSAPP
 // ==========================================
 function submitCosmicOrder(event) {
     event.preventDefault();
@@ -301,7 +299,7 @@ function submitCosmicOrder(event) {
 }
 
 // ==========================================
-// 7. SYSTEME DE CACHE INTÉGRÉ (OFFLINE NAVIGATION)
+// 7. ENREGISTREMENT DU SERVICE WORKER (OFFLINE SESSIONS)
 // ==========================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
